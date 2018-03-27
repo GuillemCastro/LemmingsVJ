@@ -37,7 +37,8 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	float currentTime;
 	glm::mat4 projection;
-	Lemming lemming;
+	//Lemming lemming;
+	Lemming lemmings[10];
 
 };
 

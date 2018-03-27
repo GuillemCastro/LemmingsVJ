@@ -35,8 +35,12 @@ void Scene::init()
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
-	lemming.init(glm::vec2(60, 30), simpleTexProgram);
-	lemming.setMapMask(&maskTexture);
+	//lemming.init(glm::vec2(60, 30), simpleTexProgram);
+	//lemming.setMapMask(&maskTexture);
+	for (int i = 0; i < 10; ++i) {
+		lemmings[i].init(glm::vec2(60 + 10*i, 30), simpleTexProgram);
+		lemmings[i].setMapMask(&maskTexture);
+	}
 }
 
 unsigned int x = 0;
@@ -44,7 +48,10 @@ unsigned int x = 0;
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	lemming.update(deltaTime);
+	//lemming.update(deltaTime);
+	for (int i = 0; i < 10; ++i) {
+		lemmings[i].update(deltaTime);
+	}
 }
 
 void Scene::render()
@@ -63,7 +70,10 @@ void Scene::render()
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
-	lemming.render();
+	//lemming.render();
+	for (int i = 0; i < 10; ++i) {
+		lemmings[i].render();
+	}
 }
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
