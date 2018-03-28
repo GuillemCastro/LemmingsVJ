@@ -38,19 +38,25 @@ void Scene::init()
 	//lemming.init(glm::vec2(60, 30), simpleTexProgram);
 	//lemming.setMapMask(&maskTexture);
 	for (int i = 0; i < 10; ++i) {
-		lemmings[i].init(glm::vec2(60 + 10*i, 30), simpleTexProgram);
+		lemmings[i].init(glm::vec2(60 + 10, 30), simpleTexProgram);
 		lemmings[i].setMapMask(&maskTexture);
 	}
+		lemmingInit[0] = 1;
 }
 
 unsigned int x = 0;
 
+
+
 void Scene::update(int deltaTime)
 {
+
 	currentTime += deltaTime;
+	int init = currentTime / 2000;
+	lemmingInit[init] = 1;
 	//lemming.update(deltaTime);
 	for (int i = 0; i < 10; ++i) {
-		lemmings[i].update(deltaTime);
+		if (lemmingInit[i]) lemmings[i].update(deltaTime);
 	}
 }
 
@@ -72,7 +78,7 @@ void Scene::render()
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 	//lemming.render();
 	for (int i = 0; i < 10; ++i) {
-		lemmings[i].render();
+		if (lemmingInit[i]) lemmings[i].render();
 	}
 }
 

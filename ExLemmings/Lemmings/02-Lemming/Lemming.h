@@ -17,7 +17,7 @@ public:
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
-	
+	bool isInit();
 	void setMapMask(VariableTexture *mapMask);
 	
 private:
@@ -34,6 +34,7 @@ private:
 	Texture spritesheet;
 	Sprite *sprite;
 	VariableTexture *mask;
+	bool initalized;
 
 };
 

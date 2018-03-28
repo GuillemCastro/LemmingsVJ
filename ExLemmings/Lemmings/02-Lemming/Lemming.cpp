@@ -16,7 +16,6 @@ enum LemmingAnims
 	WALKING_LEFT, WALKING_RIGHT, FALLING_RIGHT
 };
 
-
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
 	state = FALLING_RIGHT_STATE;
@@ -38,10 +37,11 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 		for (int i = 0; i<8; i++)
 			sprite->addKeyframe(FALLING_RIGHT, glm::vec2(float(i) / 8, 0.67f));
 
-		
+	
 	sprite->changeAnimation(WALKING_RIGHT);
 	sprite->setPosition(initialPosition);
 }
+
 
 void Lemming::update(int deltaTime)
 {

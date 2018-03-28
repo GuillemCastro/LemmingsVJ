@@ -22,7 +22,7 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
-	
+	void spawnLemming(int i);
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
 
 private:
@@ -39,6 +39,7 @@ private:
 	glm::mat4 projection;
 	//Lemming lemming;
 	Lemming lemmings[10];
+	bool lemmingInit[10];
 
 };
 
