@@ -14,7 +14,7 @@
 
 enum LemmingAnims
 {
-	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, BLOCKING, DIGGING
+	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING
 };
 
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
@@ -24,28 +24,40 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	spritesheet.loadFromFile("images/lemming_spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.setMinFilter(GL_NEAREST);
 	spritesheet.setMagFilter(GL_NEAREST);
-	sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.2), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(5);
+
+	float numAnim = 6.0f;
+	sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, (1/numAnim)), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(numAnim);
 	
-		sprite->setAnimationSpeed(WALKING_RIGHT, 12);
-		for(int i=0; i<8; i++)
-			sprite->addKeyframe(WALKING_RIGHT, glm::vec2(float(i) / 16, 0.0f));
+	sprite->setAnimationSpeed(WALKING_RIGHT, 12);
+	float y = 0.0f;
+	for(int i=0; i<8; i++)
+		sprite->addKeyframe(WALKING_RIGHT, glm::vec2(float(i) / 16, y));
 		
-		sprite->setAnimationSpeed(WALKING_LEFT, 12);
-		for(int i=0; i<8; i++)
-			sprite->addKeyframe(WALKING_LEFT, glm::vec2(float(i) / 16, 0.2f));
+	sprite->setAnimationSpeed(WALKING_LEFT, 12);
+	y += 1 / numAnim;
+	for(int i=0; i<8; i++)
+		sprite->addKeyframe(WALKING_LEFT, glm::vec2(float(i) / 16, y));
 
-		sprite->setAnimationSpeed(UMBRELLA_RIGHT, 12);
-		for (int i = 0; i<8; i++)
-			sprite->addKeyframe(UMBRELLA_RIGHT, glm::vec2(float(i) / 16, 0.4f));
+	sprite->setAnimationSpeed(UMBRELLA_RIGHT, 10);
+	y += 1 / numAnim;
+	for (int i = 0; i<12; i++)
+		sprite->addKeyframe(UMBRELLA_RIGHT, glm::vec2(float(i) / 16, y));
 
-		sprite->setAnimationSpeed(BLOCKING, 12);
-		for (int i = 0; i<16; i++)
-			sprite->addKeyframe(BLOCKING, glm::vec2(float(i) / 16, 0.6f));
+	sprite->setAnimationSpeed(UMBRELLA_LEFT, 10);
+	y += 1 / numAnim;
+	for (int i = 11; i>=0; i--) // Done because sprite is backwards
+		sprite->addKeyframe(UMBRELLA_LEFT, glm::vec2(float(i) / 16, y));
 
-		sprite->setAnimationSpeed(DIGGING, 12);
-		for (int i = 0; i<8; i++)
-			sprite->addKeyframe(DIGGING, glm::vec2(float(i) / 16, 0.8f));
+	sprite->setAnimationSpeed(BLOCKING, 12);
+	y += 1 / numAnim;
+	for (int i = 0; i<16; i++)
+		sprite->addKeyframe(BLOCKING, glm::vec2(float(i) / 16, y));
+
+	sprite->setAnimationSpeed(DIGGING, 12);
+	y += 1 / numAnim;
+	for (int i = 0; i<8; i++)
+		sprite->addKeyframe(DIGGING, glm::vec2(float(i) / 16, y));
 
 	
 	sprite->changeAnimation(WALKING_RIGHT);
@@ -96,7 +108,7 @@ void Lemming::update(int deltaTime)
 			if(fall > 1)
 				sprite->position() += glm::vec2(0, 1);
 			if (fall > 2) {
-				//sprite->changeAnimation(FALLING_RIGHT);
+				sprite->changeAnimation(UMBRELLA_LEFT);
 				state = UMBRELLA_LEFT_STATE;
 			}
 		}

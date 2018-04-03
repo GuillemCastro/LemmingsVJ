@@ -47,8 +47,16 @@ int Sprite::update(int deltaTime)
 
 			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
 			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
-			if (fallinganim_start && currentKeyframe == 0 && currentAnimation == 2) currentKeyframe = 3;
-			else if (currentKeyframe == 7 && currentAnimation == 2) fallinganim_start = true;
+
+			if (currentAnimation == 2) {
+				if (fallinganim_start && currentKeyframe == 0 ) currentKeyframe = 4;
+				else if (currentKeyframe == 11) fallinganim_start = true;
+			}
+			else if (currentAnimation == 3) {
+				if (fallinganim_start && currentKeyframe == 0) currentKeyframe = 4;
+				else if (currentKeyframe == 11) fallinganim_start = true;
+			}
+
 			frames++;
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
@@ -100,7 +108,7 @@ void Sprite::changeAnimation(int animId)
 {
 	if(animId < int(animations.size()))
 	{
-		if (animId == 2) fallinganim_start = 0;
+		if ((animId == 2) || (animId == 3) ) fallinganim_start = 0;
 		currentAnimation = animId;
 		currentKeyframe = 0;
 		timeAnimation = 0.f;
