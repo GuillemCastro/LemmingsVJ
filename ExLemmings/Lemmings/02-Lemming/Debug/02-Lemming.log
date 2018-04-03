@@ -1,3 +1,2 @@
-﻿  Scene.cpp
-c:\users\ingrid terra\documents\lemmingsvj\exlemmings\lemmings\02-lemming\scene.cpp(55): warning C4244: 'inicializando': conversión de 'float' a 'int'; posible pérdida de datos
-  02-Lemming.vcxproj -> C:\Users\Ingrid Terra\Documents\LemmingsVJ\ExLemmings\Lemmings\02-Lemming\Debug\02-Lemming.exe
+﻿  Sprite.cpp
+  02-Lemming.vcxproj -> C:\Users\Guillem\Documents\Uni\VJ\LemmingsVJ\ExLemmings\Lemmings\02-Lemming\Debug\02-Lemming.exe

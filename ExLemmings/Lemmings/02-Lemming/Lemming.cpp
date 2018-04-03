@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include "Lemming.h"
 #include "Game.h"
+#include <algorithm>
 
 
 #define JUMP_ANGLE_STEP 4
@@ -106,6 +107,20 @@ void Lemming::update(int deltaTime)
 				state = FALLING_RIGHT_STATE;
 		}
 		break;
+	case DIGGER_STATE: {
+		fall = collisionFloor(2);
+		if (fall > 0) {
+			state = FALLING_RIGHT_STATE;
+			sprite->changeAnimation(FALLING_RIGHT);
+		}
+		else {
+			sprite->position() += glm::vec2(0, 1);
+			for (int x = max(0.0f, sprite->position().x + 4); x <= min(mask->width() - 1.0f, sprite->position().x + 8.0f); ++x) {
+				mask->setPixel(x + 120, sprite->position().y + 15, 0);
+			}
+		}
+		break;
+	}
 	}
 }
 
@@ -117,6 +132,16 @@ void Lemming::render()
 void Lemming::setMapMask(VariableTexture *mapMask)
 {
 	mask = mapMask;
+}
+
+bool Lemming::insideCollisionBox(int x, int y) {
+	//cout << "collision box for this lemming is x_min: " << sprite->position().x << " x_max: " << sprite->position().x + 16 << endl;
+	//cout << "    " << "y_min: " << sprite->position().y << " y_max: " << sprite->position().y + 16 << endl;
+	if ((x >= sprite->position().x) && (x <= sprite->position().x + 16)
+		&& (y >= sprite->position().y) && (y <= sprite->position().y + 16)) {
+		return true;
+	}
+	return false;
 }
 
 int Lemming::collisionFloor(int maxFall)
@@ -148,6 +173,41 @@ bool Lemming::collision()
 	return true;
 }
 
+void Lemming::setPower(LemmingPower power) {
+
+	bool left = false;
+	if (state == WALKING_LEFT_STATE || state == FALLING_LEFT_STATE || state == BASHER_LEFT
+		|| state == CLIMBER_LEFT || state == BUILDER_LEFT) {
+		left = true;
+	}
+
+	switch (power) {
+	case DIGGER: {
+		state = DIGGER_STATE;
+		break;
+	}
+
+	case BASHER: {
+		state = left ? BASHER_LEFT : BASHER_RIGHT;
+		break;
+	}
+
+	case CLIMBER: {
+		state = left ? CLIMBER_LEFT : CLIMBER_RIGHT;
+		break;
+	}
+
+	case BUILDER: {
+		state = left ? BUILDER_LEFT : BUILDER_RIGHT;
+		break;
+	}
+
+	case BLOCKER: {
+		state = BLOCKER_STATE;
+		break;
+	}
+	}
+}
 
 
 

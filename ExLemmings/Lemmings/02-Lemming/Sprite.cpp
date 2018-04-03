@@ -47,7 +47,7 @@ int Sprite::update(int deltaTime)
 
 			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
 			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
-			if (fallinganim_start && currentKeyframe == 0) currentKeyframe = 3;
+			if (fallinganim_start && currentKeyframe == 0 && currentAnimation == 2) currentKeyframe = 3;
 			else if (currentKeyframe == 7 && currentAnimation == 2) fallinganim_start = true;
 			frames++;
 		}
