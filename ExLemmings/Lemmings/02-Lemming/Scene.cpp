@@ -98,6 +98,21 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			selectedLemming->setPower(DIGGER);
 		}
 	}
+
+	if (bRightButton) {
+		cout << "clicked at " << mouseX / 3 << " " << mouseY / 3 << endl;
+		Lemming* selectedLemming;
+		bool selected = false;
+		for (int i = 0; i < 10; ++i) {
+			if (lemmings[i].insideCollisionBox(mouseX / 3, mouseY / 3)) {
+				selected = true;
+				selectedLemming = &lemmings[i];
+			}
+		}
+		if (selected) {
+			selectedLemming->setPower(BLOCKER);
+		}
+	}
 }
 
 void Scene::eraseMask(int mouseX, int mouseY)
