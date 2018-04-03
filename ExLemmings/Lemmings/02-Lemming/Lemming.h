@@ -38,11 +38,13 @@ private:
 		BUILDER_RIGHT, BLOCKER_STATE
 	};
 
+	const int blockerMask = 1;
 	LemmingState state;
 	Texture spritesheet;
 	Sprite *sprite;
 	VariableTexture *mask;
 	bool initalized;
+	bool ignoreBlocker;
 
 };
 

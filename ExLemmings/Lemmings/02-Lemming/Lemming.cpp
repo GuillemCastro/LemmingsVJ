@@ -19,6 +19,7 @@ enum LemmingAnims
 
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
+	ignoreBlocker = 0; // when lemmings fall on top of a bloquer they must ignore it
 	state = FALLING_RIGHT_STATE;
 	spritesheet.loadFromFile("images/lemming_spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.setMinFilter(GL_NEAREST);
@@ -131,7 +132,7 @@ void Lemming::update(int deltaTime)
 
 		for (int x = max(0.0f, sprite->position().x + 2.0f); x <= min(mask->width() - 1.0f, sprite->position().x + 12.0f); ++x) {
 			for (int y = max(0.0f, sprite->position().y+5.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 15.0f); ++y) {
-				if (mask->pixel(x + 120, y) == 0.0f) mask->setPixel(x + 120, y, 1.0f); // This will be an issue when we have the escavator as he might be able to escavate though a lemming
+				if (mask->pixel(x + 120, y) == 0.0f) mask->setPixel(x + 120, y, blockerMask); // This will be an issue when we have the escavator as he might be able to escavate though a lemming
 			}
 		}
 		break;
@@ -170,6 +171,10 @@ int Lemming::collisionFloor(int maxFall)
 	{
 		if((mask->pixel(posBase.x, posBase.y+fall) == 0) && (mask->pixel(posBase.x+1, posBase.y+fall) == 0))
 			fall += 1;
+		else if ((mask->pixel(posBase.x, posBase.y + fall) == blockerMask) && (mask->pixel(posBase.x + 1, posBase.y + fall) == blockerMask)) {
+			ignoreBlocker = 1;
+			fall += 1;
+		}
 		else
 			bContact = true;
 	}
@@ -182,8 +187,12 @@ bool Lemming::collision()
 	glm::ivec2 posBase = sprite->position() + glm::vec2(120, 0); // Add the map displacement
 	
 	posBase += glm::ivec2(7, 15);
-	if ((mask->pixel(posBase.x, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y-1) == 0))
+	if ((mask->pixel(posBase.x, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y - 1) == 0)) {
+		if (ignoreBlocker) ignoreBlocker = 0;
 		return false; // lemming can no longer fit though 1 pixel blocs, they now must have at least be 2 pixels with the mask set to 0 no not detect collision
+	}
+	else if (((mask->pixel(posBase.x, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y - 1) == blockerMask)) && (ignoreBlocker))
+		return false;  // so there are no bugs when lemmings fall on blockers
 	return true;
 }
 

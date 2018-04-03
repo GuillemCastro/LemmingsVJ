@@ -22,6 +22,8 @@ public:
 	VariableTexture();
 	~VariableTexture();
 
+
+
 	bool loadFromFile(const string &filename, PixelFormat imageFormat);
 	void loadFromGlyphBuffer(unsigned char *buffer, int width, int height);
 
