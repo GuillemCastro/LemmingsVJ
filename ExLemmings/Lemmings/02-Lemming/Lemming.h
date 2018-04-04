@@ -11,7 +11,7 @@
 
 enum LemmingPower {
 
-	DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER
+	NONE, DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER
 };
 
 class Lemming
@@ -40,6 +40,7 @@ private:
 
 	const int blockerMask = 1;
 	LemmingState state;
+	LemmingPower power;
 	Texture spritesheet;
 	Sprite *sprite;
 	VariableTexture *mask;

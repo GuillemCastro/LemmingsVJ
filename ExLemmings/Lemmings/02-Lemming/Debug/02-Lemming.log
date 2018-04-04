@@ -1,9 +1,0 @@
-﻿  Lemming.cpp
-e:\users\david\documents\lemmingsvj\exlemmings\lemmings\02-lemming\lemming.cpp(30): warning C4244: 'argumento': conversión de 'float' a 'int'; posible pérdida de datos
-e:\users\david\documents\lemmingsvj\exlemmings\lemmings\02-lemming\lemming.cpp(150): warning C4244: 'inicializando': conversión de 'const float' a 'int'; posible pérdida de datos
-e:\users\david\documents\lemmingsvj\exlemmings\lemmings\02-lemming\lemming.cpp(151): warning C4244: 'argumento': conversión de 'float' a 'unsigned int'; posible pérdida de datos
-e:\users\david\documents\lemmingsvj\exlemmings\lemmings\02-lemming\lemming.cpp(167): warning C4244: 'inicializando': conversión de 'const float' a 'int'; posible pérdida de datos
-e:\users\david\documents\lemmingsvj\exlemmings\lemmings\02-lemming\lemming.cpp(168): warning C4244: 'inicializando': conversión de 'const float' a 'int'; posible pérdida de datos
-  Sprite.cpp
-  Generando código...
-  02-Lemming.vcxproj -> E:\Users\David\Documents\LemmingsVJ\ExLemmings\Lemmings\02-Lemming\Debug\02-Lemming.exe

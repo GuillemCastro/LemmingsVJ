@@ -14,13 +14,14 @@
 
 enum LemmingAnims
 {
-	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING
+	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING, BASHING_RIGHT, BASHING_LEFT
 };
 
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
 {
 	ignoreBlocker = 0; // when lemmings fall on top of a bloquer they must ignore it
 	state = WALKING_RIGHT_STATE;
+	power = NONE;
 	spritesheet.loadFromFile("images/lemming_spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.setMinFilter(GL_NEAREST);
 	spritesheet.setMagFilter(GL_NEAREST);
@@ -96,9 +97,14 @@ void Lemming::update(int deltaTime)
 		sprite->position() += glm::vec2(-1, -1);
 		if(collision())
 		{
-			sprite->position() -= glm::vec2(-1, -1);
-			sprite->changeAnimation(WALKING_RIGHT);
-			state = WALKING_RIGHT_STATE;
+			if (power == BASHER) {
+				state = BASHER_LEFT;
+			}
+			else {
+				sprite->position() -= glm::vec2(-1, -1);
+				sprite->changeAnimation(WALKING_RIGHT);
+				state = WALKING_RIGHT_STATE;
+			}
 		}
 		else
 		{
@@ -117,9 +123,14 @@ void Lemming::update(int deltaTime)
 		sprite->position() += glm::vec2(1, -1);
 		if(collision())
 		{
-			sprite->position() -= glm::vec2(1, -1);
-			sprite->changeAnimation(WALKING_LEFT);
-			state = WALKING_LEFT_STATE;
+			if (power == BASHER) {
+				state = BASHER_RIGHT;
+			}
+			else {
+				sprite->position() -= glm::vec2(1, -1);
+				sprite->changeAnimation(WALKING_LEFT);
+				state = WALKING_LEFT_STATE;
+			}
 		}
 		else
 		{
@@ -139,6 +150,7 @@ void Lemming::update(int deltaTime)
 		fall = collisionFloor(2);
 		if (fall > 0) {
 			state = UMBRELLA_RIGHT_STATE;
+			power = NONE;
 			sprite->changeAnimation(UMBRELLA_RIGHT);
 		}
 		else {
@@ -149,6 +161,44 @@ void Lemming::update(int deltaTime)
 
 			for (int x = max(0.0f, sprite->position().x + 4.0f); x <= min(mask->width() - 1.0f, sprite->position().x + 10.0f); ++x) {
 				mask->setPixel(x + 120, sprite->position().y + 15, 0);
+			}
+		}
+		break;
+	}
+
+	case BASHER_LEFT: {
+		fall = collisionFloor(2);
+		if (fall > 0) {
+			state = UMBRELLA_LEFT_STATE;
+			power = NONE;
+			sprite->changeAnimation(UMBRELLA_LEFT);
+		}
+		else {
+			if (sprite->animation() != BASHING_LEFT) {
+				//change to bashing left
+			}
+			sprite->position() += glm::vec2(-1.0f, 0.0f);
+			for (int y = max(0.0f, sprite->position().y + 8.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 16.0f); ++y) {
+				mask->setPixel(sprite->position().x + 120 + 8.f, y, 0);
+			}
+		}
+		break;
+	}
+
+	case BASHER_RIGHT: {
+		fall = collisionFloor(2);
+		if (fall > 0) {
+			state = UMBRELLA_RIGHT_STATE;
+			power = NONE;
+			sprite->changeAnimation(UMBRELLA_RIGHT);
+		}
+		else {
+			if (sprite->animation() != BASHING_RIGHT) {
+				//change to bashing RIGHT
+			}
+			sprite->position() += glm::vec2(1.0f, 0.0f);
+			for (int y = max(0.0f, sprite->position().y + 8.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 16.0f); ++y) {
+				mask->setPixel(sprite->position().x + 120.0f + 7.9f, y, 0);
 			}
 		}
 		break;
@@ -233,6 +283,8 @@ bool Lemming::collision()
 
 void Lemming::setPower(LemmingPower power) {
 
+	this->power = power;
+
 	bool left = false;
 	if (state == WALKING_LEFT_STATE || state == FALLING_LEFT_STATE || state == BASHER_LEFT
 		|| state == CLIMBER_LEFT || state == BUILDER_LEFT || state == UMBRELLA_LEFT_STATE) {
@@ -245,10 +297,10 @@ void Lemming::setPower(LemmingPower power) {
 		break;
 	}
 
-	case BASHER: {
-		state = left ? BASHER_LEFT : BASHER_RIGHT;
+	/*case BASHER: {
+		state = left ? BASHER_LEFT : BASHER_RIGHT; basher only bash when collision() == true
 		break;
-	}
+	}*/
 
 	case CLIMBER: {
 		state = left ? CLIMBER_LEFT : CLIMBER_RIGHT;
