@@ -39,6 +39,7 @@ bool Game::update(int deltaTime)
 			}
 			case SCENE1: {
 				scene->update(deltaTime);
+				break;
 			}
 		}
 	}	
@@ -171,8 +172,10 @@ void Game::changeScene(GameScene scene) {
 	switch (state) {
 		case MENU:
 			delete menuScene;
+			break;
 		case SCENE1:
 			delete this->scene;
+			break;
 	}
 	state = scene;
 	paused = false;
@@ -180,9 +183,11 @@ void Game::changeScene(GameScene scene) {
 		case MENU:
 			menuScene = new MenuScene();
 			menuScene->init();
+			break;
 		case SCENE1:
 			this->scene = new Scene();
 			this->scene->init();
+			break;
 	}
 }
 

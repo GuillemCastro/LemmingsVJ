@@ -40,8 +40,10 @@ void Scene::init()
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(60 + 10, 30), simpleTexProgram);
 		lemmings[i].setMapMask(&maskTexture);
+		lemmingInit[i] = 0;
 	}
 		lemmingInit[0] = 1;
+
 }
 
 unsigned int x = 0;
@@ -50,7 +52,6 @@ unsigned int x = 0;
 
 void Scene::update(int deltaTime)
 {
-
 	currentTime += deltaTime;
 	int init = currentTime / 2000;
 	lemmingInit[init] = true;
