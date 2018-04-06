@@ -4,11 +4,16 @@
 
 #include "Scene.h"
 #include "Text.h"
+#include "TexturedQuad.h"
 #include <iostream>
+#include "MenuScene.h"
 
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 
+enum GameScene {
+	MENU, SCENE1, SCENE2, SCENE3
+};
 
 class Game
 {
@@ -42,15 +47,26 @@ public:
 	bool getKey(int key) const;
 	bool getSpecialKey(int key) const;
 
+	void changeScene(GameScene state);
+
 private:
+
+	void initShaders();
+
 	bool bPlay;                       // Continue to play game?
 	bool paused;					  // Game paused?
-	Scene scene;                      // Scene to render
+	Scene* scene;                      // Scene to render
+	MenuScene* menuScene;
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time
 	int mouseX, mouseY;               // Mouse position
 	bool bLeftMouse, bRightMouse;     // Mouse button states
 	Text pausedText;
+	TexturedQuad* pausedQuad;
+	Texture plainTexture;
+	ShaderProgram simpleTexProgram, maskedTexProgram;
+	glm::mat4 projection;
+	GameScene state;
 
 };
 

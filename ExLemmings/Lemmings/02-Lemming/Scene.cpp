@@ -53,8 +53,7 @@ void Scene::update(int deltaTime)
 
 	currentTime += deltaTime;
 	int init = currentTime / 2000;
-	lemmingInit[init] = 1;
-	//lemming.update(deltaTime);
+	lemmingInit[init] = true;
 	for (int i = 0; i < 10; ++i) {
 		if (lemmingInit[i]) lemmings[i].update(deltaTime);
 	}
