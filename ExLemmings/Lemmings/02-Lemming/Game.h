@@ -68,6 +68,11 @@ private:
 	glm::mat4 projection;
 	GameScene state;
 
+	Texture cursorNormal;
+	Texture cursorSelected;
+	TexturedQuad* cursor;
+
+	bool lemmingSelected;
 };
 
 

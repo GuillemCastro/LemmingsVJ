@@ -198,5 +198,13 @@ void Scene::initShaders()
 	fShader.free();
 }
 
-
+bool Scene::isALemmingAt(int x, int y) {
+	bool lemmingThere = false;
+	for (int i = 0; i < 10; ++i) {
+		if (lemmings[i].insideCollisionBox(x, y)) {
+			lemmingThere = true;
+		}
+	}
+	return lemmingThere;
+}
 

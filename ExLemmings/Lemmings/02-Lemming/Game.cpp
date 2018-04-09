@@ -27,6 +27,12 @@ void Game::init()
 
 	if (!pausedText.init("fonts/OpenSans-Regular.ttf"))
 		std::cout << "Could not load font!!!" << endl;
+
+	glm::vec2 geomCursor[2] = { glm::vec2(0.0f, 0.0f), glm::vec2(10.f, 10.f) };
+
+	cursorNormal.loadFromFile("images/cursor.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	cursorSelected.loadFromFile("images/cursorsel.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	cursor = TexturedQuad::createTexturedQuad(geomCursor, texCoords, simpleTexProgram);
 }
 
 bool Game::update(int deltaTime)
@@ -35,10 +41,13 @@ bool Game::update(int deltaTime)
 		switch (state) {
 			case MENU: {
 				menuScene->update(deltaTime);
+				lemmingSelected = false;
 				break;
 			}
 			case SCENE1: {
 				scene->update(deltaTime);
+				int ratio = VIEWPORT_HEIGHT / CAMERA_HEIGHT;
+				lemmingSelected = scene->isALemmingAt(mouseX / ratio, mouseY / ratio);
 				break;
 			}
 		}
@@ -73,6 +82,21 @@ void Game::render()
 		pausedText.render("PAUSED", glm::vec2(320, 240), 72, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"P\" to resume", glm::vec2(360, 275), 20, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"M\" to return to the menu", glm::vec2(310, 300), 20, glm::vec4(1, 0.2f, 0.2f, 1));
+
+	}
+
+	glm::mat4 modelview;
+	simpleTexProgram.use();
+	simpleTexProgram.setUniformMatrix4f("projection", projection);
+	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	modelview = glm::translate(modelview, glm::vec3(mouseX/3 -5, mouseY/3-5, 0.f));
+	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+	if (lemmingSelected) {
+		cursor->render(cursorSelected);
+	}
+	else {
+		cursor->render(cursorNormal);
 	}
 }
 

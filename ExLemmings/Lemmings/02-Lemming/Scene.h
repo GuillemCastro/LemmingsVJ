@@ -24,6 +24,7 @@ public:
 	void render();
 	void spawnLemming(int i);
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
+	bool isALemmingAt(int x, int y);
 
 private:
 	void initShaders();
