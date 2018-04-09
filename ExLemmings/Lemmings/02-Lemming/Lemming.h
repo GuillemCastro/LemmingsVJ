@@ -11,7 +11,7 @@
 
 enum LemmingPower {
 
-	NONE, DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER
+	NONE, DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER, WALKER
 };
 
 class Lemming
@@ -23,6 +23,7 @@ public:
 	void render();
 	bool isInit();
 	void setMapMask(VariableTexture *mapMask);
+	void setBridges(VariableTexture* bridges);
 	void setPower(LemmingPower power);
 	bool insideCollisionBox(int x, int y);
 	
@@ -35,8 +36,8 @@ private:
 	enum LemmingState
 	{
 		WALKING_LEFT_STATE, WALKING_RIGHT_STATE, FALLING_LEFT_STATE, FALLING_RIGHT_STATE, 
-		DIGGER_STATE, BASHER_LEFT, BASHER_RIGHT, CLIMBER_LEFT, CLIMBER_RIGHT, BUILDER_LEFT, 
-		BUILDER_RIGHT, BLOCKER_STATE, UMBRELLA_RIGHT_STATE, UMBRELLA_LEFT_STATE
+		DIGGER_STATE, BASHER_LEFT_STATE, BASHER_RIGHT_STATE, CLIMBER_LEFT_STATE, CLIMBER_RIGHT_STATE, BUILDER_LEFT_STATE, 
+		BUILDER_RIGHT_STATE, BLOCKER_STATE, UMBRELLA_RIGHT_STATE, UMBRELLA_LEFT_STATE
 	};
 
 	const int blockerMask = 1;
@@ -45,6 +46,8 @@ private:
 	Texture spritesheet;
 	Sprite *sprite;
 	VariableTexture *mask;
+	VariableTexture *bridges;
+	int builderCount;
 	bool initalized;
 	bool ignoreBlocker;
 

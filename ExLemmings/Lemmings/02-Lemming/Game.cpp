@@ -9,6 +9,7 @@ void Game::init()
 	state = MENU;
 	bPlay = true;
 	paused = false;
+	faster = false;
 	bLeftMouse = bRightMouse = false;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
@@ -82,6 +83,7 @@ void Game::render()
 		pausedText.render("PAUSED", glm::vec2(320, 240), 72, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"P\" to resume", glm::vec2(360, 275), 20, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"M\" to return to the menu", glm::vec2(310, 300), 20, glm::vec4(1, 0.2f, 0.2f, 1));
+		pausedText.render("Press \"Q\" to quit the game", glm::vec2(320, 325), 20, glm::vec4(1, 0.2f, 0.2f, 1));
 
 	}
 
@@ -102,14 +104,23 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
-	if(key == 27) // Escape code
-		bPlay = false;
+	if (key == 27) // Escape code
+	{
+		if (state != MENU)
+			paused = !paused;
+		//bPlay = false;
+	}
+		
 	if (key == 'P' || key == 'p') {
 		if (state != MENU)
 			paused = !paused;
 	}
 	if ((key == 'M' || key == 'm') && paused)
 		this->changeScene(MENU);
+	if ((key == 'Q' || key == 'q') && paused)
+		bPlay = false;
+	if (key == 'W' || key == 'w')
+		faster = !faster;
 	keys[key] = true;
 }
 
@@ -269,6 +280,14 @@ void Game::initShaders() {
 	fShader.free();
 }
 
+int Game::timePerFrame() {
+	if (faster) {
+		return 1000.0f / 30.f;
+	}
+	else {
+		return 1000.f / 30.f;
+	}
+}
 
 
 

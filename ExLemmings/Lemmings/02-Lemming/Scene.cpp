@@ -32,6 +32,16 @@ void Scene::init()
 	maskTexture.setMinFilter(GL_NEAREST);
 	maskTexture.setMagFilter(GL_NEAREST);
 
+	glm::vec2 texCoordsBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(1.0f, 1.0f) };
+
+	bridges = MaskedTexturedQuad::createTexturedQuad(geom, texCoordsBridge, maskedTexProgram);
+	bridgeColorTexture.loadFromFile("images/bridge.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	bridgeColorTexture.setMinFilter(GL_NEAREST);
+	bridgeColorTexture.setMagFilter(GL_NEAREST);
+	bridgesTextureMask.loadFromFile("images/bridge_mask.png", TEXTURE_PIXEL_FORMAT_L);
+	bridgesTextureMask.setMinFilter(GL_NEAREST);
+	bridgesTextureMask.setMagFilter(GL_NEAREST);
+
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
@@ -40,6 +50,7 @@ void Scene::init()
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(60 + 10, 30), simpleTexProgram);
 		lemmings[i].setMapMask(&maskTexture);
+		lemmings[i].setBridges(&bridgesTextureMask);
 		lemmingInit[i] = 0;
 	}
 		lemmingInit[0] = 1;
@@ -70,6 +81,13 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
 	map->render(maskedTexProgram, colorTexture, maskTexture);
+
+	maskedTexProgram.use();
+	maskedTexProgram.setUniformMatrix4f("projection", projection);
+	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
+	bridges->render(maskedTexProgram, bridgeColorTexture, bridgesTextureMask);
 	
 	simpleTexProgram.use();
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
@@ -95,7 +113,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			}
 		}
 		if (selected) {
-			selectedLemming->setPower(DIGGER);
+			selectedLemming->setPower(BUILDER);
 		}
 	}
 

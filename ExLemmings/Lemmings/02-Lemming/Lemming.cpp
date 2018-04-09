@@ -22,6 +22,7 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	ignoreBlocker = 0; // when lemmings fall on top of a bloquer they must ignore it
 	state = WALKING_RIGHT_STATE;
 	power = NONE;
+	builderCount = 0;
 	spritesheet.loadFromFile("images/lemming_spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.setMinFilter(GL_NEAREST);
 	spritesheet.setMagFilter(GL_NEAREST);
@@ -80,8 +81,13 @@ void Lemming::update(int deltaTime)
 		if(fall > 0)
 			sprite->position() += glm::vec2(0, fall);
 		else {
-			sprite->changeAnimation(WALKING_LEFT);
-			state = WALKING_LEFT_STATE;
+			if (power == BUILDER) {
+				state = BUILDER_LEFT_STATE;
+			}
+			else {
+				sprite->changeAnimation(WALKING_LEFT);
+				state = WALKING_LEFT_STATE;
+			}
 		}
 		break;
 	case UMBRELLA_RIGHT_STATE:
@@ -89,8 +95,13 @@ void Lemming::update(int deltaTime)
 		if(fall > 0)
 			sprite->position() += glm::vec2(0, fall);
 		else {
-			sprite->changeAnimation(WALKING_RIGHT);
-			state = WALKING_RIGHT_STATE;
+			if (power == BUILDER) {
+				state = BUILDER_RIGHT_STATE;
+			}
+			else {
+				sprite->changeAnimation(WALKING_RIGHT);
+				state = WALKING_RIGHT_STATE;
+			}
 		}
 		break;
 	case WALKING_LEFT_STATE:
@@ -98,10 +109,10 @@ void Lemming::update(int deltaTime)
 		if(collision())
 		{
 			if (power == BASHER) {
-				state = BASHER_LEFT;
+				state = BASHER_LEFT_STATE;
 			}
 			else if (power == CLIMBER && collisionCeilling(3) > 1) {
-				state = CLIMBER_LEFT;
+				state = CLIMBER_LEFT_STATE;
 			}
 			else {
 				sprite->position() -= glm::vec2(-1, -1);
@@ -109,8 +120,7 @@ void Lemming::update(int deltaTime)
 				state = WALKING_RIGHT_STATE;
 			}
 		}
-		else
-		{
+		else if (bridges->pixel(sprite->position().x + 7, sprite->position().y + 16) == 0) {
 			fall = collisionFloor(3);
 			if(fall > 0)
 				sprite->position() += glm::vec2(0, 1);
@@ -127,11 +137,11 @@ void Lemming::update(int deltaTime)
 		if(collision())
 		{
 			if (power == BASHER) {
-				state = BASHER_RIGHT;
+				state = BASHER_RIGHT_STATE;
 			}
 			else if (power == CLIMBER && collisionCeilling(3) > 1) {
 				cout << "collisionCeilling " << collisionCeilling(3) << endl;
-				state = CLIMBER_RIGHT;
+				state = CLIMBER_RIGHT_STATE;
 			}
 			else {
 				sprite->position() -= glm::vec2(1, -1);
@@ -139,8 +149,7 @@ void Lemming::update(int deltaTime)
 				state = WALKING_LEFT_STATE;
 			}
 		}
-		else
-		{
+		else if (bridges->pixel(sprite->position().x + 7, sprite->position().y + 16) == 0) {
 			fall = collisionFloor(3);
 			if (fall > 0)
 				sprite->position() += glm::vec2(0, 1);
@@ -173,7 +182,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 
-	case BASHER_LEFT: {
+	case BASHER_LEFT_STATE: {
 		fall = collisionFloor(2);
 		if (fall > 0) {
 			state = UMBRELLA_LEFT_STATE;
@@ -192,7 +201,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 
-	case BASHER_RIGHT: {
+	case BASHER_RIGHT_STATE: {
 		fall = collisionFloor(2);
 		if (fall > 0) {
 			state = UMBRELLA_RIGHT_STATE;
@@ -229,7 +238,7 @@ void Lemming::update(int deltaTime)
 		}
 		break;
 	}
-	case CLIMBER_LEFT: {
+	case CLIMBER_LEFT_STATE: {
 		sprite->position() += glm::vec2(0.f, -1.f);
 		int ceilling = collisionCeilling(1);
 		fall = collisionFloor(2);
@@ -250,7 +259,7 @@ void Lemming::update(int deltaTime)
 		}
 		break;
 	}
-	case CLIMBER_RIGHT: {
+	case CLIMBER_RIGHT_STATE: {
 		sprite->position() += glm::vec2(0.f, -1.f);
 		int ceilling = collisionCeilling(1);
 		fall = collisionFloor(2);
@@ -268,6 +277,46 @@ void Lemming::update(int deltaTime)
 				if (sprite->animation() != WALKING_RIGHT)
 					sprite->changeAnimation(WALKING_RIGHT);
 			}
+		}
+		break;
+	}
+	case BUILDER_LEFT_STATE: {
+		if (builderCount >= 50) {
+			builderCount = 0;
+			power = NONE;
+			state = WALKING_LEFT_STATE;
+			sprite->changeAnimation(WALKING_LEFT);
+		}
+		else if (collision()) {
+			builderCount = 0;
+			power = NONE;
+			state = WALKING_RIGHT_STATE;
+			sprite->changeAnimation(WALKING_RIGHT);
+		}
+		else {
+			sprite->position() += glm::vec2(-1.f, -1.f);
+			bridges->setPixel(sprite->position().x + 7, sprite->position().y + 16, 255);
+			builderCount += 1;
+		}
+		break;
+	}
+	case BUILDER_RIGHT_STATE: {
+		if (builderCount >= 50) {
+			builderCount = 0;
+			power = NONE;
+			state = WALKING_RIGHT_STATE;
+			sprite->changeAnimation(WALKING_RIGHT);
+		}
+		else if (collision()) {
+			builderCount = 0;
+			power = NONE;
+			state = WALKING_LEFT_STATE;
+			sprite->changeAnimation(WALKING_LEFT);
+		}
+		else {
+			bridges->setPixel(sprite->position().x + 7, sprite->position().y + 16, 255);
+			sprite->position() += glm::vec2(1.f, -1.f);
+			builderCount += 1;
 		}
 		break;
 	}
@@ -308,7 +357,8 @@ int Lemming::collisionFloor(int maxFall)
 	posBase += glm::ivec2(7, 16);
 	while((fall < maxFall) && !bContact)
 	{
-		if((mask->pixel(posBase.x, posBase.y+fall) == 0) && (mask->pixel(posBase.x+1, posBase.y+fall) == 0))
+		if((mask->pixel(posBase.x, posBase.y+fall) == 0) && (mask->pixel(posBase.x+1, posBase.y+fall) == 0) &&
+			(bridges->pixel(posBase.x, posBase.y + fall) == 0) && (bridges->pixel(posBase.x + 1, posBase.y + fall) == 0))
 			fall += 1;
 		else if ((mask->pixel(posBase.x, posBase.y + fall) == blockerMask) && (mask->pixel(posBase.x + 1, posBase.y + fall) == blockerMask)) {
 			ignoreBlocker = 1;
@@ -337,11 +387,15 @@ bool Lemming::collision()
 
 void Lemming::setPower(LemmingPower power) {
 
+	if (this->power == CLIMBER) {
+		return; // The climber is a permanent skill!
+	}
+
 	this->power = power;
 
 	bool left = false;
-	if (state == WALKING_LEFT_STATE || state == FALLING_LEFT_STATE || state == BASHER_LEFT
-		|| state == CLIMBER_LEFT || state == BUILDER_LEFT || state == UMBRELLA_LEFT_STATE) {
+	if (state == WALKING_LEFT_STATE || state == FALLING_LEFT_STATE || state == BASHER_LEFT_STATE
+		|| state == CLIMBER_LEFT_STATE || state == BUILDER_LEFT_STATE || state == UMBRELLA_LEFT_STATE) {
 		left = true;
 	}
 
@@ -362,12 +416,18 @@ void Lemming::setPower(LemmingPower power) {
 	}*/
 
 	case BUILDER: {
-		state = left ? BUILDER_LEFT : BUILDER_RIGHT;
+		if (state != UMBRELLA_LEFT_STATE && state != UMBRELLA_RIGHT_STATE)
+			state = left ? BUILDER_LEFT_STATE : BUILDER_RIGHT_STATE;
 		break;
 	}
 
 	case BLOCKER: {
 		state = BLOCKER_STATE;
+		break;
+	}
+	case WALKER: {
+		this->power = NONE;
+		state = left ? WALKING_LEFT_STATE : WALKING_RIGHT_STATE;
 		break;
 	}
 	}
@@ -395,7 +455,7 @@ int Lemming::collisionCeilling(int max) {
 	return fall;
 }
 
-
-
-
+void Lemming::setBridges(VariableTexture* bridges) {
+	this->bridges = bridges;
+}
 

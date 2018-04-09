@@ -49,6 +49,8 @@ public:
 
 	void changeScene(GameScene state);
 
+	int timePerFrame();
+
 private:
 
 	void initShaders();
@@ -73,6 +75,7 @@ private:
 	TexturedQuad* cursor;
 
 	bool lemmingSelected;
+	bool faster;
 };
 
 

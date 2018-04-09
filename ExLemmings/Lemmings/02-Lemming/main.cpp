@@ -69,8 +69,10 @@ static void idleCallback()
 {
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - prevTime;
-	
-	if(deltaTime > TIME_PER_FRAME)
+
+	int timePerFrame = Game::instance().timePerFrame();
+	cout << "timePerframe" << timePerFrame <<  " deltaTime " << deltaTime << endl;
+	if(deltaTime > timePerFrame)
 	{
 		// Every time we enter here is equivalent to a game loop execution
 		if(!Game::instance().update(deltaTime))
