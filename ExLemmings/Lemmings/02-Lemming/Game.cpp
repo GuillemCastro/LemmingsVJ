@@ -11,7 +11,7 @@ void Game::init()
 	paused = false;
 	faster = false;
 	bLeftMouse = bRightMouse = false;
-	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.f, 0.f, 0.f, 1.f/*0.3f, 0.3f, 0.3f, 1.0f*/);
 
 	menuScene = new MenuScene();
 	menuScene->init();
