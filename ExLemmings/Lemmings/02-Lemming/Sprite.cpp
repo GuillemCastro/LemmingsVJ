@@ -33,7 +33,8 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	shaderProgram = program;
 	currentAnimation = -1;
 	pos = glm::vec2(0.f);
-	dead = 0;
+	stop_render = 0;
+	explosion = 0;
 }
 
 int Sprite::update(int deltaTime)
@@ -47,10 +48,11 @@ int Sprite::update(int deltaTime)
 		{
 
 			if (currentAnimation == 6) { //DEATH
-				if (currentKeyframe == 15) { dead = 1; }
+				if (currentKeyframe == 15) { stop_render = 1; }
 			}
-			if (currentAnimation == 7) {
-				if (currentKeyframe == 15) { dead = 1; }
+			if (currentAnimation == 7) { //EXPLOSION
+				if (currentKeyframe == 15) { stop_render = 1; }
+				else if (currentKeyframe == 7) { explosion = 1; }
 			}
 
 			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
@@ -75,7 +77,7 @@ int Sprite::update(int deltaTime)
 
 void Sprite::render() const
 {
-	if (!dead) {
+	if (!stop_render) {
 		glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.f));
 		shaderProgram->setUniformMatrix4f("modelview", modelview);
 		shaderProgram->setUniform2f("texCoordDispl", texCoordDispl.x, texCoordDispl.y);
@@ -124,6 +126,14 @@ void Sprite::changeAnimation(int animId)
 		timeAnimation = 0.f;
 		texCoordDispl = animations[animId].keyframeDispl[0];
 	}
+}
+
+bool Sprite::explosionKeyframe() {
+	if (explosion) {
+		explosion = 0;
+		return true;
+	}
+	return false;
 }
 
 int Sprite::animation() const

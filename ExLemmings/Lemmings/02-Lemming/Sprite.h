@@ -30,6 +30,7 @@ public:
 	void setAnimationSpeed(int animId, int keyframesPerSec);
 	void addKeyframe(int animId, const glm::vec2 &frame);
 	void changeAnimation(int animId);
+	bool explosionKeyframe();
 	int animation() const;
 	
 	void setPosition(const glm::vec2 &newPos);
@@ -48,7 +49,8 @@ private:
 	glm::vec2 texCoordDispl;
 	vector<AnimKeyframes> animations;
 	bool fallinganim_start;
-	bool dead;
+	bool stop_render;
+	bool explosion;
 
 };
 

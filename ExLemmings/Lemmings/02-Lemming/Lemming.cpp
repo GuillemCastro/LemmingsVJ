@@ -339,6 +339,21 @@ void Lemming::update(int deltaTime)
 		if (sprite->animation() != EXPLOSION) {
 			sprite->changeAnimation(EXPLOSION);
 		}
+		if (sprite->explosionKeyframe()) {
+			float r = 10.0f;
+			glm::vec2 pos = sprite->position();
+			pos.x += 8;
+			pos.y += 14;
+			for (int x = max(0.0f, sprite->position().x- 5.0f); x <= min(mask->width() - 1.0f, sprite->position().x + 20.0f); ++x) {
+				for (int y = max(0.0f, sprite->position().y - 4.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 25.0f); ++y) {
+					glm::vec2 aux(x, y);
+					float dist = distance(pos, aux);
+					if (dist < r) {
+						mask->setPixel(x + 120, y, 0);
+					}
+				}			
+			}	
+		}
 	}
 }
 
