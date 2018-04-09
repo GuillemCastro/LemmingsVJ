@@ -48,6 +48,7 @@ private:
 	glm::vec2 texCoordDispl;
 	vector<AnimKeyframes> animations;
 	bool fallinganim_start;
+	bool dead;
 
 };
 

@@ -33,6 +33,7 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	shaderProgram = program;
 	currentAnimation = -1;
 	pos = glm::vec2(0.f);
+	dead = 0;
 }
 
 int Sprite::update(int deltaTime)
@@ -45,6 +46,13 @@ int Sprite::update(int deltaTime)
 		while(timeAnimation > animations[currentAnimation].millisecsPerKeyframe)
 		{
 
+			if (currentAnimation == 6) { //DEATH
+				if (currentKeyframe == 15) { dead = 1; }
+			}
+			if (currentAnimation == 7) {
+				if (currentKeyframe == 15) { dead = 1; }
+			}
+
 			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
 			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
 
@@ -56,7 +64,7 @@ int Sprite::update(int deltaTime)
 				if (fallinganim_start && currentKeyframe == 0) currentKeyframe = 4;
 				else if (currentKeyframe == 11) fallinganim_start = true;
 			}
-
+			
 			frames++;
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
@@ -67,18 +75,20 @@ int Sprite::update(int deltaTime)
 
 void Sprite::render() const
 {
-	glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.f));
-	shaderProgram->setUniformMatrix4f("modelview", modelview);
-	shaderProgram->setUniform2f("texCoordDispl", texCoordDispl.x, texCoordDispl.y);
-	glEnable(GL_TEXTURE_2D);
-	shaderProgram->setTextureUnit("tex", 0);
-	glActiveTexture(GL_TEXTURE0);
-	texture->use();
-	glBindVertexArray(vao);
-	glEnableVertexAttribArray(posLocation);
-	glEnableVertexAttribArray(texCoordLocation);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDisable(GL_TEXTURE_2D);
+	if (!dead) {
+		glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.f));
+		shaderProgram->setUniformMatrix4f("modelview", modelview);
+		shaderProgram->setUniform2f("texCoordDispl", texCoordDispl.x, texCoordDispl.y);
+		glEnable(GL_TEXTURE_2D);
+		shaderProgram->setTextureUnit("tex", 0);
+		glActiveTexture(GL_TEXTURE0);
+		texture->use();
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(posLocation);
+		glEnableVertexAttribArray(texCoordLocation);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 void Sprite::free()

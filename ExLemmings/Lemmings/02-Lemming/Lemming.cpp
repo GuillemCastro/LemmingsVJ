@@ -14,7 +14,7 @@
 
 enum LemmingAnims
 {
-	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING, BASHING_RIGHT, BASHING_LEFT
+	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING, DEATH, EXPLOSION, BASHING_RIGHT, BASHING_LEFT
 };
 
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
@@ -27,7 +27,7 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	spritesheet.setMinFilter(GL_NEAREST);
 	spritesheet.setMagFilter(GL_NEAREST);
 
-	float numAnim = 6.0f;
+	float numAnim = 8.0f;
 	sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, (1/numAnim)), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(numAnim);
 	
@@ -61,6 +61,15 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	for (int i = 0; i<8; i++)
 		sprite->addKeyframe(DIGGING, glm::vec2(float(i) / 16, y));
 
+	sprite->setAnimationSpeed(DEATH, 12);
+	y += 1 / numAnim;
+	for (int i = 0; i<16; i++)
+		sprite->addKeyframe(DEATH, glm::vec2(float(i) / 16, y));
+
+	sprite->setAnimationSpeed(EXPLOSION, 12);
+	y += 1 / numAnim;
+	for (int i = 0; i<16; i++)
+		sprite->addKeyframe(EXPLOSION, glm::vec2(float(i) / 16, y));
 	
 	sprite->changeAnimation(WALKING_RIGHT);
 	sprite->setPosition(initialPosition);
@@ -101,6 +110,7 @@ void Lemming::update(int deltaTime)
 			else {
 				sprite->changeAnimation(WALKING_RIGHT);
 				state = WALKING_RIGHT_STATE;
+				break;
 			}
 		}
 		break;
@@ -320,6 +330,15 @@ void Lemming::update(int deltaTime)
 		}
 		break;
 	}
+	case DEAD_STATE:
+		if (sprite->animation() != DEATH) {
+			sprite->changeAnimation(DEATH);
+		}
+		break;
+	case EXPLOAD_STATE:
+		if (sprite->animation() != EXPLOSION) {
+			sprite->changeAnimation(EXPLOSION);
+		}
 	}
 }
 
@@ -428,6 +447,11 @@ void Lemming::setPower(LemmingPower power) {
 	case WALKER: {
 		this->power = NONE;
 		state = left ? WALKING_LEFT_STATE : WALKING_RIGHT_STATE;
+		break;
+	}
+	case EXPLOADER: {
+		this->power = NONE;
+		state = EXPLOAD_STATE;
 		break;
 	}
 	}
