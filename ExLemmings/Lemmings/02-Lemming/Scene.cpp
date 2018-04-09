@@ -95,7 +95,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			}
 		}
 		if (selected) {
-			selectedLemming->setPower(BASHER);
+			selectedLemming->setPower(DIGGER);
 		}
 	}
 

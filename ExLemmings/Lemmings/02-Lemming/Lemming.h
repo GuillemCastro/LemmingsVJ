@@ -29,6 +29,7 @@ public:
 private:
 	int collisionFloor(int maxFall);
 	bool collision();
+	int collisionCeilling(int max);
 	
 private:
 	enum LemmingState

@@ -100,6 +100,9 @@ void Lemming::update(int deltaTime)
 			if (power == BASHER) {
 				state = BASHER_LEFT;
 			}
+			else if (power == CLIMBER && collisionCeilling(3) > 1) {
+				state = CLIMBER_LEFT;
+			}
 			else {
 				sprite->position() -= glm::vec2(-1, -1);
 				sprite->changeAnimation(WALKING_RIGHT);
@@ -125,6 +128,10 @@ void Lemming::update(int deltaTime)
 		{
 			if (power == BASHER) {
 				state = BASHER_RIGHT;
+			}
+			else if (power == CLIMBER && collisionCeilling(3) > 1) {
+				cout << "collisionCeilling " << collisionCeilling(3) << endl;
+				state = CLIMBER_RIGHT;
 			}
 			else {
 				sprite->position() -= glm::vec2(1, -1);
@@ -222,6 +229,48 @@ void Lemming::update(int deltaTime)
 		}
 		break;
 	}
+	case CLIMBER_LEFT: {
+		sprite->position() += glm::vec2(0.f, -1.f);
+		int ceilling = collisionCeilling(1);
+		fall = collisionFloor(2);
+		if (!collision()) {
+			state = WALKING_LEFT_STATE;
+			sprite->changeAnimation(WALKING_LEFT);
+		}
+		if (ceilling > 0) {
+			if (fall > 0) {
+				state = UMBRELLA_LEFT_STATE;
+				sprite->changeAnimation(UMBRELLA_LEFT);
+			}
+			else {
+				state = WALKING_LEFT_STATE;
+				if (sprite->animation() != WALKING_LEFT)
+					sprite->changeAnimation(WALKING_LEFT);
+			}
+		}
+		break;
+	}
+	case CLIMBER_RIGHT: {
+		sprite->position() += glm::vec2(0.f, -1.f);
+		int ceilling = collisionCeilling(1);
+		fall = collisionFloor(2);
+		if (!collision()) {
+			state = WALKING_RIGHT_STATE;
+			sprite->changeAnimation(WALKING_RIGHT);
+		}
+		if (ceilling > 0) {
+			if (fall > 0) {
+				state = UMBRELLA_RIGHT_STATE;
+				sprite->changeAnimation(UMBRELLA_RIGHT);
+			}
+			else {
+				state = WALKING_RIGHT_STATE;
+				if (sprite->animation() != WALKING_RIGHT)
+					sprite->changeAnimation(WALKING_RIGHT);
+			}
+		}
+		break;
+	}
 	}
 }
 
@@ -250,6 +299,11 @@ int Lemming::collisionFloor(int maxFall)
 	bool bContact = false;
 	int fall = 0;
 	glm::ivec2 posBase = sprite->position() + glm::vec2(120, 0); // Add the map displacement
+
+	if (collisionCeilling(3) == 1) {
+		cout << "collisionCeilling is 1" << endl;
+		return 1;
+	}
 	
 	posBase += glm::ivec2(7, 16);
 	while((fall < maxFall) && !bContact)
@@ -300,12 +354,12 @@ void Lemming::setPower(LemmingPower power) {
 	/*case BASHER: {
 		state = left ? BASHER_LEFT : BASHER_RIGHT; basher only bash when collision() == true
 		break;
-	}*/
+	}
 
 	case CLIMBER: {
 		state = left ? CLIMBER_LEFT : CLIMBER_RIGHT;
 		break;
-	}
+	}*/
 
 	case BUILDER: {
 		state = left ? BUILDER_LEFT : BUILDER_RIGHT;
@@ -319,6 +373,27 @@ void Lemming::setPower(LemmingPower power) {
 	}
 }
 
+int Lemming::collisionCeilling(int max) {
+
+	bool bContact = false;
+	int fall = 0;
+	glm::ivec2 posBase = sprite->position() + glm::vec2(120, 0); // Add the map displacement
+
+	posBase += glm::ivec2(7, 0);
+	while ((fall < max) && !bContact)
+	{
+		if ((mask->pixel(posBase.x, posBase.y - fall) == 0))
+			fall += 1;
+		else if ((mask->pixel(posBase.x, posBase.y - fall) == blockerMask) && (mask->pixel(posBase.x + 1, posBase.y - fall) == blockerMask)) {
+			ignoreBlocker = 1;
+			fall += 1;
+		}
+		else
+			bContact = true;
+	}
+
+	return fall;
+}
 
 
 
