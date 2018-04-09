@@ -2,6 +2,13 @@
 #include <GL/glut.h>
 #include "Game.h"
 
+#define _WIN32_WINNT 0x0500
+#include <windows.h>
+#include <mmsystem.h>
+#include <iostream>
+#include <fstream>
+#include <conio.h>
+
 
 //Remove console (only works in Visual Studio)
 //#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
@@ -71,7 +78,6 @@ static void idleCallback()
 	int deltaTime = currentTime - prevTime;
 
 	int timePerFrame = Game::instance().timePerFrame();
-	cout << "timePerframe" << timePerFrame <<  " deltaTime " << deltaTime << endl;
 	if(deltaTime > timePerFrame)
 	{
 		// Every time we enter here is equivalent to a game loop execution
@@ -111,6 +117,9 @@ int main(int argc, char **argv)
 	// Game instance initialization
 	Game::instance().init();
 	prevTime = glutGet(GLUT_ELAPSED_TIME);
+
+	PlaySound(TEXT("sounds/lemmings1.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
 	// GLUT gains control of the application
 	glutMainLoop();
 
