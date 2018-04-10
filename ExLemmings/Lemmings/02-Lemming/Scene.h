@@ -34,6 +34,10 @@ private:
 
 private:
 	Texture colorTexture;
+
+	Texture buttonsTexture;
+	TexturedQuad* buttonQuad;
+
 	VariableTexture maskTexture;
 	MaskedTexturedQuad *map;
 	Texture bridgeColorTexture;
@@ -44,7 +48,7 @@ private:
 	glm::mat4 projection;
 	//Lemming lemming;
 	Lemming lemmings[10];
-	bool lemmingInit[10];
+	bool lemmingAlive[10];
 
 };
 

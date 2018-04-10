@@ -35,6 +35,7 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	pos = glm::vec2(0.f);
 	stop_render = 0;
 	explosion = 0;
+	death = 0;
 }
 
 int Sprite::update(int deltaTime)
@@ -48,10 +49,10 @@ int Sprite::update(int deltaTime)
 		{
 
 			if (currentAnimation == 6) { //DEATH
-				if (currentKeyframe == 15) { stop_render = 1; }
+				if (currentKeyframe == 15) { stop_render = 1; death = 1; }
 			}
 			if (currentAnimation == 7) { //EXPLOSION
-				if (currentKeyframe == 15) { stop_render = 1; }
+				if (currentKeyframe == 15) { stop_render = 1; death = 1; }
 				else if (currentKeyframe == 7) { explosion = 1; }
 			}
 
@@ -134,6 +135,10 @@ bool Sprite::explosionKeyframe() {
 		return true;
 	}
 	return false;
+}
+
+bool Sprite::deathKeyframe() {
+	return death;
 }
 
 int Sprite::animation() const

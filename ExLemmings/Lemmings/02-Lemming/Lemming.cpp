@@ -14,7 +14,7 @@
 
 enum LemmingAnims
 {
-	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING, DEATH, EXPLOSION, BASHING_RIGHT, BASHING_LEFT
+	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING, DEATH, EXPLOSION, FALLING_RIGHT, FALLING_LEFT, BASHING_RIGHT, BASHING_LEFT
 };
 
 void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram)
@@ -22,12 +22,14 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	ignoreBlocker = 0; // when lemmings fall on top of a bloquer they must ignore it
 	state = WALKING_RIGHT_STATE;
 	power = NONE;
+	initalized = 1;
 	builderCount = 0;
+	fallHight = 0;
 	spritesheet.loadFromFile("images/lemming_spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.setMinFilter(GL_NEAREST);
 	spritesheet.setMagFilter(GL_NEAREST);
 
-	float numAnim = 8.0f;
+	float numAnim = 10.0f;
 	sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, (1/numAnim)), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(numAnim);
 	
@@ -70,6 +72,16 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	y += 1 / numAnim;
 	for (int i = 0; i<16; i++)
 		sprite->addKeyframe(EXPLOSION, glm::vec2(float(i) / 16, y));
+
+	sprite->setAnimationSpeed(FALLING_RIGHT, 10);
+	y += 1 / numAnim;
+	for (int i = 0; i<4; i++)
+		sprite->addKeyframe(FALLING_RIGHT, glm::vec2(float(i) / 16, y));
+
+	sprite->setAnimationSpeed(FALLING_LEFT, 10);
+	y += 1 / numAnim;
+	for (int i = 3; i >= 0; i--) // Done because sprite is backwards
+		sprite->addKeyframe(FALLING_LEFT, glm::vec2(float(i) / 16, y));
 	
 	sprite->changeAnimation(WALKING_RIGHT);
 	sprite->setPosition(initialPosition);
@@ -85,10 +97,68 @@ void Lemming::update(int deltaTime)
 
 	switch(state)
 	{
+	case FALLING_RIGHT_STATE:
+		if (power == UMBRELLA) {
+			state = UMBRELLA_RIGHT_STATE;
+			break;
+		}
+
+		fall = collisionFloor(2);
+		if (fall > 0) {
+			sprite->position() += glm::vec2(0, fall);
+			fallHight += fall;
+		}
+		else {
+			if (fallHight > 30) {
+				sprite->changeAnimation(DEATH);
+				state = DEAD_STATE;
+			}
+			else {
+				if (power == BUILDER) {
+					fallHight = 0;
+					state = BUILDER_RIGHT_STATE;
+				}
+				else {
+					fallHight = 0;
+					sprite->changeAnimation(WALKING_RIGHT);
+					state = WALKING_RIGHT_STATE;
+					break;
+				}
+			}
+		}
+		break;
+	case FALLING_LEFT_STATE:
+		if (power == UMBRELLA) {
+			state = UMBRELLA_LEFT_STATE;
+			break;
+		}
+
+		fall = collisionFloor(2);
+		if (fall > 0)
+			sprite->position() += glm::vec2(0, fall);
+		else {
+			if (fallHight > 30) {
+				sprite->changeAnimation(DEATH);
+				state = DEAD_STATE;
+			}
+			else {
+				if (power == BUILDER) {
+					fallHight = 0;
+					state = BUILDER_RIGHT_STATE;
+				}
+				else {
+					fallHight = 0;
+					sprite->changeAnimation(WALKING_RIGHT);
+					state = WALKING_RIGHT_STATE;
+					break;
+				}
+			}
+		}
+		break;
 	case UMBRELLA_LEFT_STATE:
 		fall = collisionFloor(2);
 		if(fall > 0)
-			sprite->position() += glm::vec2(0, fall);
+			sprite->position() += glm::vec2(0, 2);
 		else {
 			if (power == BUILDER) {
 				state = BUILDER_LEFT_STATE;
@@ -102,7 +172,7 @@ void Lemming::update(int deltaTime)
 	case UMBRELLA_RIGHT_STATE:
 		fall = collisionFloor(2);
 		if(fall > 0)
-			sprite->position() += glm::vec2(0, fall);
+			sprite->position() += glm::vec2(0, 2);
 		else {
 			if (power == BUILDER) {
 				state = BUILDER_RIGHT_STATE;
@@ -137,8 +207,8 @@ void Lemming::update(int deltaTime)
 			if(fall > 1)
 				sprite->position() += glm::vec2(0, 1);
 			if (fall > 2) {
-				sprite->changeAnimation(UMBRELLA_LEFT);
-				state = UMBRELLA_LEFT_STATE;
+				sprite->changeAnimation(FALLING_LEFT);
+				state = FALLING_LEFT_STATE;
 			}
 		}
 		break;
@@ -166,9 +236,8 @@ void Lemming::update(int deltaTime)
 			if (fall > 1)
 				sprite->position() += glm::vec2(0, 1);
 			if (fall > 2) {
-				//sprite->changeAnimation(FALLING_RIGHT);
-				sprite->changeAnimation(UMBRELLA_RIGHT);
-				state = UMBRELLA_RIGHT_STATE;
+				sprite->changeAnimation(FALLING_RIGHT);
+				state = FALLING_RIGHT_STATE;
 			}		
 		}
 		break;
@@ -177,7 +246,7 @@ void Lemming::update(int deltaTime)
 		if (fall > 0) {
 			state = UMBRELLA_RIGHT_STATE;
 			power = NONE;
-			sprite->changeAnimation(UMBRELLA_RIGHT);
+			sprite->changeAnimation(FALLING_RIGHT);
 		}
 		else {
 			if (sprite->animation() != DIGGING) {
@@ -195,9 +264,9 @@ void Lemming::update(int deltaTime)
 	case BASHER_LEFT_STATE: {
 		fall = collisionFloor(2);
 		if (fall > 0) {
-			state = UMBRELLA_LEFT_STATE;
+			state = FALLING_LEFT_STATE;
 			power = NONE;
-			sprite->changeAnimation(UMBRELLA_LEFT);
+			sprite->changeAnimation(FALLING_LEFT);
 		}
 		else {
 			if (sprite->animation() != BASHING_LEFT) {
@@ -214,9 +283,9 @@ void Lemming::update(int deltaTime)
 	case BASHER_RIGHT_STATE: {
 		fall = collisionFloor(2);
 		if (fall > 0) {
-			state = UMBRELLA_RIGHT_STATE;
+			state = FALLING_RIGHT_STATE;
 			power = NONE;
-			sprite->changeAnimation(UMBRELLA_RIGHT);
+			sprite->changeAnimation(FALLING_RIGHT);
 		}
 		else {
 			if (sprite->animation() != BASHING_RIGHT) {
@@ -232,8 +301,8 @@ void Lemming::update(int deltaTime)
 	case BLOCKER_STATE: {
 		fall = collisionFloor(2);
 		if (fall > 0) {
-			state = UMBRELLA_RIGHT_STATE;
-			sprite->changeAnimation(UMBRELLA_RIGHT_STATE);
+			state = FALLING_RIGHT_STATE;
+			sprite->changeAnimation(FALLING_RIGHT_STATE);
 		}
 		else {
 			if (sprite->animation() != BLOCKING) {
@@ -258,8 +327,8 @@ void Lemming::update(int deltaTime)
 		}
 		if (ceilling > 0) {
 			if (fall > 0) {
-				state = UMBRELLA_LEFT_STATE;
-				sprite->changeAnimation(UMBRELLA_LEFT);
+				state = FALLING_LEFT_STATE;
+				sprite->changeAnimation(FALLING_LEFT);
 			}
 			else {
 				state = WALKING_LEFT_STATE;
@@ -279,8 +348,8 @@ void Lemming::update(int deltaTime)
 		}
 		if (ceilling > 0) {
 			if (fall > 0) {
-				state = UMBRELLA_RIGHT_STATE;
-				sprite->changeAnimation(UMBRELLA_RIGHT);
+				state = FALLING_RIGHT_STATE;
+				sprite->changeAnimation(FALLING_RIGHT);
 			}
 			else {
 				state = WALKING_RIGHT_STATE;
@@ -331,9 +400,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case DEAD_STATE:
-		if (sprite->animation() != DEATH) {
-			sprite->changeAnimation(DEATH);
-		}
+		if (sprite->deathKeyframe()) alive = 0;
 		break;
 	case EXPLOAD_STATE:
 		if (sprite->animation() != EXPLOSION) {
@@ -352,13 +419,15 @@ void Lemming::update(int deltaTime)
 						mask->setPixel(x + 120, y, 0);
 					}
 				}			
-			}	
+			}
+			state = DEAD_STATE;
 		}
 	}
 }
 
 void Lemming::render()
 {
+	alive = 1;
 	sprite->render();
 }
 
@@ -496,5 +565,12 @@ int Lemming::collisionCeilling(int max) {
 
 void Lemming::setBridges(VariableTexture* bridges) {
 	this->bridges = bridges;
+}
+
+bool Lemming::isAlive() {
+	if (initalized && !alive) {
+		return 0;
+	}
+	return true;
 }
 
