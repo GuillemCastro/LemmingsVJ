@@ -103,6 +103,7 @@ void Lemming::update(int deltaTime)
 	case FALLING_RIGHT_STATE:
 		if (power == UMBRELLA) {
 			state = UMBRELLA_RIGHT_STATE;
+			sprite->changeAnimation(UMBRELLA_RIGHT);
 			break;
 		}
 
@@ -133,6 +134,7 @@ void Lemming::update(int deltaTime)
 	case FALLING_LEFT_STATE:
 		if (power == UMBRELLA) {
 			state = UMBRELLA_LEFT_STATE;
+			sprite->changeAnimation(UMBRELLA_LEFT);
 			break;
 		}
 

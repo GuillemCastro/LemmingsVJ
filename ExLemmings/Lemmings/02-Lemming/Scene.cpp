@@ -131,6 +131,44 @@ void Scene::render()
 	
 }
 
+void Scene::powerSelect(int powerNumber) {
+	switch (powerNumber) {
+		case 2: {
+			powerSelected = CLIMBER;
+			break;
+		}
+		case 3: {
+			powerSelected = UMBRELLA;
+			break;
+		}
+		case 4: {
+			powerSelected = EXPLOADER;
+			break;
+		}
+		case 5: {
+			powerSelected = BLOCKER;
+			break;
+		}
+		case 6: {
+			powerSelected = BUILDER;
+			break;
+		}
+		case 7: {
+			powerSelected = BASHER;
+			break;
+		}
+		case 9: {
+			powerSelected = DIGGER;
+			break;
+		}
+		default: {
+			powerSelected = NONE;
+			break;
+		}
+	}
+	return;
+}
+
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
 	int x = mouseX / 3;
@@ -146,6 +184,16 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			}
 		}
 
+		if (y > (CAMERA_HEIGHT-30) && y <= CAMERA_HEIGHT) {
+
+			for (float i = 0.f; i < CAMERA_WIDTH; i += (CAMERA_WIDTH)/12) {
+				if (x >= i && x < (i + CAMERA_WIDTH / 12)) {
+					int powerNumber = (i / CAMERA_WIDTH) * 12 + 1;
+					powerSelect(powerNumber);
+				}
+			}
+		}
+
 		Lemming* selectedLemming;
 		bool selected = false;
 		for (int i = 0; i < 10; ++i) {
@@ -155,7 +203,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			}
 		}
 		if (selected) {
-			selectedLemming->setPower(EXPLOADER);
+			selectedLemming->setPower(powerSelected);
 		}
 	}
 

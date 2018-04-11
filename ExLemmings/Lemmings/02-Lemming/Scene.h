@@ -31,6 +31,7 @@ private:
 	void initShaders();
 	void eraseMask(int mouseX, int mouseY);
 	void applyMask(int mouseX, int mouseY);
+	void powerSelect(int powerNumber);
 
 private:
 	Texture colorTexture;
@@ -50,7 +51,7 @@ private:
 	Lemming lemmings[10];
 	bool lemmingInit[10];
 	int numLemmingsAlive;
-
+	LemmingPower powerSelected;
 };
 
 
