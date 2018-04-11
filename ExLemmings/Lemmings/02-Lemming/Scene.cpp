@@ -8,14 +8,21 @@
 Scene::Scene()
 {
 	map = NULL;
+	bridges = NULL;
+	buttonQuad = NULL;
 }
 
 Scene::~Scene()
 {
+	map->free();
+	bridges->free();
+	buttonQuad->free();
 	if(map != NULL)
 		delete map;
 	if (bridges != NULL)
 		delete bridges;
+	if (buttonQuad != NULL)
+		delete buttonQuad;
 
 }
 
@@ -27,8 +34,6 @@ void Scene::init()
 	glm::vec2 geomButton[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), 30.f) };
 	glm::vec2 texCoordsButton[2] = { glm::vec2(0.0f,  0.0f), glm::vec2(1.f, 1.f) };
 
-
-
 	initShaders();
 
 	map = MaskedTexturedQuad::createTexturedQuad(geom, texCoords, maskedTexProgram);
@@ -39,15 +44,10 @@ void Scene::init()
 	maskTexture.setMinFilter(GL_NEAREST);
 	maskTexture.setMagFilter(GL_NEAREST);
 
-	buttonQuad = TexturedQuad::createTexturedQuad(geomButton, texCoordsButton, simpleTexProgram);
-	buttonsTexture.loadFromFile("images/buttons.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	buttonsTexture.setMinFilter(GL_NEAREST);
-	buttonsTexture.setMagFilter(GL_NEAREST);
-
-
 	glm::vec2 texCoordsBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(1.0f, 1.0f) };
+	glm::vec2 geomBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT) - 30) };
 
-	bridges = MaskedTexturedQuad::createTexturedQuad(geom, texCoordsBridge, maskedTexProgram);
+	bridges = MaskedTexturedQuad::createTexturedQuad(geomBridge, texCoordsBridge, maskedTexProgram);
 	bridgeColorTexture.loadFromFile("images/bridge.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	bridgeColorTexture.setMinFilter(GL_NEAREST);
 	bridgeColorTexture.setMagFilter(GL_NEAREST);
@@ -55,39 +55,53 @@ void Scene::init()
 	bridgesTextureMask.setMinFilter(GL_NEAREST);
 	bridgesTextureMask.setMagFilter(GL_NEAREST);
 
+	buttonQuad = TexturedQuad::createTexturedQuad(geomButton, texCoordsButton, buttonsTexProgram);
+	buttonsTexture.loadFromFile("images/buttons.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	buttonsTexture.setMinFilter(GL_NEAREST);
+	buttonsTexture.setMagFilter(GL_NEAREST);
+
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
-	//lemming.init(glm::vec2(60, 30), simpleTexProgram);
-	//lemming.setMapMask(&maskTexture);
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(60 + 10, 30), simpleTexProgram);
 		lemmings[i].setMapMask(&maskTexture);
 		lemmings[i].setBridges(&bridgesTextureMask);
-		lemmingAlive[i] = 0;
+		lemmingInit[i] = 0;
 	}
-	lemmingAlive[0] = 1;
+	lemmingInit[0] = 1;
 
 }
 
 unsigned int x = 0;
 
-
-
-
 void Scene::update(int deltaTime)
 {
+	numLemmingsAlive = 0;
 	currentTime += deltaTime;
 	int init = currentTime / 2000;
-	lemmingAlive[init] = true;
+	lemmingInit[init] = true;
 	for (int i = 0; i < 10; ++i) {
-		if (lemmingAlive[i]) lemmings[i].update(deltaTime);
+		if (lemmings[i].isAlive()) {
+			numLemmingsAlive++;
+		}
+		if (lemmingInit[i]) {
+			lemmings[i].update(deltaTime);
+		}
 	}
 }
 
 void Scene::render()
 {
 	glm::mat4 modelview;
+
+	buttonsTexProgram.use();
+	buttonsTexProgram.setUniformMatrix4f("projection", projection);
+	buttonsTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	modelview = glm::translate(modelview, glm::vec3(0.f, float(CAMERA_HEIGHT) - 30.f, 0.f));
+	buttonsTexProgram.setUniformMatrix4f("modelview", modelview);
+	buttonQuad->render(buttonsTexture);
 
 	maskedTexProgram.use();
 	maskedTexProgram.setUniformMatrix4f("projection", projection);
@@ -102,38 +116,36 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
 	bridges->render(maskedTexProgram, bridgeColorTexture, bridgesTextureMask);
-
 	
-	maskedTexProgram.use();
-	maskedTexProgram.setUniformMatrix4f("projection", projection);
-	maskedTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	modelview = glm::mat4(1.0f);
-	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
-	bridges->render(maskedTexProgram, buttonsTexture, bridgesTextureMask);
-	
-	
-	simpleTexProgram.use();
-	simpleTexProgram.setUniformMatrix4f("projection", projection);
-	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	modelview = glm::mat4(1.0f);
-	modelview = glm::translate(modelview, glm::vec3(0.f, float(CAMERA_HEIGHT) - 30.f, 0.f));
-	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
-	//buttonQuad->render(buttonsTexture);
-
-
-	//lemming.render();
 	for (int i = 0; i < 10; ++i) {
-		if (!lemmings[i].isAlive()) {
-			lemmingAlive[i] = 0;
+		if (lemmingInit[i]) {
+			simpleTexProgram.use();
+			simpleTexProgram.setUniformMatrix4f("projection", projection);
+			simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+			modelview = glm::mat4(1.0f);
+			simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+			lemmings[i].render();
 		}
-		if (lemmingAlive[i]) lemmings[i].render();
 	}
+
+	
 }
 
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
+	int x = mouseX / 3;
+	int y = mouseY / 3;
 	if (bLeftButton) {
 		cout << "clicked at " << mouseX/3 << " " << mouseY/3 << endl;
+
+		if (x >= 292 && x <= 320 && y >= 160 && y <= 190) {
+			for (int i = 0; i < 10; ++i) {
+				if (lemmingInit[i]) {
+					lemmings[i].setPower(EXPLOADER);
+				}
+			}
+		}
+
 		Lemming* selectedLemming;
 		bool selected = false;
 		for (int i = 0; i < 10; ++i) {
@@ -211,6 +223,12 @@ void Scene::initShaders()
 	simpleTexProgram.addShader(vShader);
 	simpleTexProgram.addShader(fShader);
 	simpleTexProgram.link();
+
+	buttonsTexProgram.init();
+	buttonsTexProgram.addShader(vShader);
+	buttonsTexProgram.addShader(fShader);
+	buttonsTexProgram.link();
+
 	if(!simpleTexProgram.isLinked())
 	{
 		cout << "Shader Linking Error" << endl;
@@ -249,7 +267,7 @@ void Scene::initShaders()
 bool Scene::isALemmingAt(int x, int y) {
 	bool lemmingThere = false;
 	for (int i = 0; i < 10; ++i) {
-		if (lemmings[i].insideCollisionBox(x, y) && lemmingAlive[i]) {
+		if (lemmings[i].insideCollisionBox(x, y) && lemmingInit[i]) {
 			lemmingThere = true;
 		}
 	}

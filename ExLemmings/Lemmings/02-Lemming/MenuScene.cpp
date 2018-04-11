@@ -10,6 +10,10 @@ MenuScene::MenuScene()
 
 MenuScene::~MenuScene()
 {
+	menuScreen->free();
+	levelButton->free();
+	delete menuScreen;
+	delete levelButton;
 }
 
 void MenuScene::init() {

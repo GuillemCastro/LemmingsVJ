@@ -4,6 +4,9 @@
 #include <GL/glut.h>
 #include "Lemming.h"
 #include "Game.h"
+#define _WIN32_WINNT 0x0500
+#include <windows.h>
+#include <mmsystem.h>
 #include <algorithm>
 
 
@@ -400,13 +403,16 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case DEAD_STATE:
-		if (sprite->deathKeyframe()) alive = 0;
+		if (sprite->deathKeyframe()) {
+			alive = 0;
+		}
 		break;
 	case EXPLOAD_STATE:
 		if (sprite->animation() != EXPLOSION) {
 			sprite->changeAnimation(EXPLOSION);
 		}
 		if (sprite->explosionKeyframe()) {
+			PlaySound(TEXT("sounds/EXPLODE.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			float r = 10.0f;
 			glm::vec2 pos = sprite->position();
 			pos.x += 8;
@@ -421,6 +427,7 @@ void Lemming::update(int deltaTime)
 				}			
 			}
 			state = DEAD_STATE;
+			PlaySound(TEXT("sounds/lemmings1.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		}
 	}
 }

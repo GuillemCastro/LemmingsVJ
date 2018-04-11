@@ -43,12 +43,13 @@ private:
 	Texture bridgeColorTexture;
 	VariableTexture bridgesTextureMask;
 	MaskedTexturedQuad* bridges;
-	ShaderProgram simpleTexProgram, maskedTexProgram;
+	ShaderProgram simpleTexProgram, maskedTexProgram, buttonsTexProgram;
 	float currentTime;
 	glm::mat4 projection;
 	//Lemming lemming;
 	Lemming lemmings[10];
-	bool lemmingAlive[10];
+	bool lemmingInit[10];
+	int numLemmingsAlive;
 
 };
 

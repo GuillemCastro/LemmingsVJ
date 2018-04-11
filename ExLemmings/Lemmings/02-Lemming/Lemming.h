@@ -18,6 +18,11 @@ class Lemming
 {
 
 public:
+
+	~Lemming() {
+		if (sprite != NULL)
+			delete sprite;
+	}
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();

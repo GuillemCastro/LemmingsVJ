@@ -41,14 +41,24 @@ bool Game::update(int deltaTime)
 	if (!paused) {
 		switch (state) {
 			case MENU: {
+				if (scene1 != NULL) {
+					//delete scene1;
+					scene1 = NULL;
+				}
+
 				menuScene->update(deltaTime);
 				lemmingSelected = false;
 				break;
 			}
 			case SCENE1: {
-				scene->update(deltaTime);
+				if (menuScene != NULL) {
+					delete menuScene;
+					menuScene = NULL;
+				}
+
+				scene1->update(deltaTime);
 				int ratio = VIEWPORT_HEIGHT / CAMERA_HEIGHT;
-				lemmingSelected = scene->isALemmingAt(mouseX / ratio, mouseY / ratio);
+				lemmingSelected = scene1->isALemmingAt(mouseX / ratio, mouseY / ratio);
 				break;
 			}
 		}
@@ -65,7 +75,7 @@ void Game::render()
 			break;
 		}
 		case SCENE1: {
-			scene->render();
+			scene1->render();
 		}
 	}
 	if (paused) {
@@ -149,7 +159,8 @@ void Game::mouseMove(int x, int y)
 			break;
 		}
 		case SCENE1: {
-			scene->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+			scene1->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+			break;
 		}
 	}
 }
@@ -166,7 +177,8 @@ void Game::mousePress(int button)
 				break;
 			}
 			case SCENE1: {
-				scene->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				scene1->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
 			}
 		}
 	}
@@ -179,7 +191,8 @@ void Game::mousePress(int button)
 				break;
 			}
 			case SCENE1: {
-				scene->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				scene1->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
 			}
 		}
 	}
@@ -204,24 +217,19 @@ bool Game::getSpecialKey(int key) const
 }
 
 void Game::changeScene(GameScene scene) {
-	switch (state) {
-		case MENU:
-			delete menuScene;
-			break;
-		case SCENE1:
-			delete this->scene;
-			break;
+	if (this->state == scene) {
+		return;
 	}
 	state = scene;
 	paused = false;
 	switch (scene) {
 		case MENU:
-			menuScene = new MenuScene();
+			menuScene = new MenuScene;
 			menuScene->init();
 			break;
 		case SCENE1:
-			this->scene = new Scene();
-			this->scene->init();
+			this->scene1 = new Scene;
+			this->scene1->init();
 			break;
 	}
 }

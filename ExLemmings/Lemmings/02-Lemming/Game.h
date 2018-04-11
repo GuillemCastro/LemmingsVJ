@@ -19,7 +19,10 @@ class Game
 {
 
 public:
-	Game() {}
+	Game() {
+		this->scene1 = NULL;
+		this->menuScene = NULL;
+	}
 	
 	
 	static Game &instance()
@@ -57,7 +60,7 @@ private:
 
 	bool bPlay;                       // Continue to play game?
 	bool paused;					  // Game paused?
-	Scene* scene;                      // Scene to render
+	Scene* scene1;                      // Scene to render
 	MenuScene* menuScene;
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time
