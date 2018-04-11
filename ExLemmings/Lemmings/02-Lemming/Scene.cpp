@@ -14,6 +14,9 @@ Scene::~Scene()
 {
 	if(map != NULL)
 		delete map;
+	if (bridges != NULL)
+		delete bridges;
+
 }
 
 

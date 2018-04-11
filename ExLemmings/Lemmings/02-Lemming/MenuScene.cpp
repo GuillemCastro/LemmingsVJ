@@ -13,7 +13,7 @@ MenuScene::~MenuScene()
 }
 
 void MenuScene::init() {
-	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)) };
+	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT) - 30) };
 	glm::vec2 geomButtons[2] = {glm::vec2(0.f, 0.f), glm::vec2(50.0f, 25.0f)};
 	glm::vec2 texCoords[2] = { glm::vec2(0.0f, 0.f), glm::vec2(1.0f, 1.0f) };
 
@@ -51,6 +51,7 @@ void MenuScene::render() {
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
+	modelview = glm::translate(modelview, glm::vec3(0.f, 30.f, 0.f));
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 
 	menuScreen->render(colorTexture);
@@ -59,7 +60,7 @@ void MenuScene::render() {
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", .0f, 1.0f, .0f, 1.0f);
 	modelview = glm::mat4(1.0f);
-	modelview = glm::translate(modelview, glm::vec3(55.f, 100.0f, 0.0f));
+	modelview = glm::translate(modelview, glm::vec3(55.f, 130.0f, 0.0f));
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 
 	levelButton->render(level1Tex);
@@ -68,7 +69,7 @@ void MenuScene::render() {
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", .0f, .0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
-	modelview = glm::translate(modelview, glm::vec3(135.f, 100.0f, 0.0f));
+	modelview = glm::translate(modelview, glm::vec3(135.f, 130.0f, 0.0f));
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 
 	levelButton->render(level2Tex);
@@ -77,7 +78,7 @@ void MenuScene::render() {
 	simpleTexProgram.setUniformMatrix4f("projection", projection);
 	simpleTexProgram.setUniform4f("color", 1.0f, 0.f, .0f, 1.0f);
 	modelview = glm::mat4(1.0f);
-	modelview = glm::translate(modelview, glm::vec3(225.f, 100.0f, 0.0f));
+	modelview = glm::translate(modelview, glm::vec3(225.f, 130.0f, 0.0f));
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 
 	levelButton->render(level3Tex);
@@ -90,13 +91,13 @@ void MenuScene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRight
 
 	if (bLeftButton) {
 
-		if (x >= 55 && x <= 105 && y >= 100 && y <= 125) {
+		if (x >= 55 && x <= 105 && y >= 130 && y <= 155) {
 			Game::instance().changeScene(SCENE1);
 		}
-		else if (x >= 135 && x <= 185 && y >= 100 && y <= 125) {
+		else if (x >= 135 && x <= 185 && y >= 130 && y <= 155) {
 			Game::instance().changeScene(SCENE2);
 		}
-		else if (x >= 225 && x <= 275 && y >= 100 && y <= 125) {
+		else if (x >= 225 && x <= 275 && y >= 130 && y <= 155) {
 			Game::instance().changeScene(SCENE3);
 		}
 	}
