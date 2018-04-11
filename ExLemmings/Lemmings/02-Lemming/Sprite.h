@@ -31,6 +31,7 @@ public:
 	void addKeyframe(int animId, const glm::vec2 &frame);
 	void changeAnimation(int animId);
 	bool explosionKeyframe();
+	bool deathKeyframe();
 	int animation() const;
 	
 	void setPosition(const glm::vec2 &newPos);
@@ -51,6 +52,7 @@ private:
 	bool fallinganim_start;
 	bool stop_render;
 	bool explosion;
+	bool death;
 
 };
 

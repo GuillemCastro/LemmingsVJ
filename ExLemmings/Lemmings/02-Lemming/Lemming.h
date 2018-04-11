@@ -11,7 +11,7 @@
 
 enum LemmingPower {
 
-	NONE, DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER, WALKER, EXPLOADER
+	NONE, DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER, WALKER, EXPLOADER, UMBRELLA
 };
 
 class Lemming
@@ -21,16 +21,17 @@ public:
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
-	bool isInit();
 	void setMapMask(VariableTexture *mapMask);
 	void setBridges(VariableTexture* bridges);
 	void setPower(LemmingPower power);
 	bool insideCollisionBox(int x, int y);
+	bool isAlive();
 	
 private:
 	int collisionFloor(int maxFall);
 	bool collision();
 	int collisionCeilling(int max);
+	
 	
 private:
 	enum LemmingState
@@ -47,9 +48,11 @@ private:
 	Sprite *sprite;
 	VariableTexture *mask;
 	VariableTexture *bridges;
+	int fallHight;
 	int builderCount;
 	bool initalized;
 	bool ignoreBlocker;
+	bool alive;
 
 };
 
