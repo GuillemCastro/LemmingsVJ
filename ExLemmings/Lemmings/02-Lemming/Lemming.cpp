@@ -260,7 +260,7 @@ void Lemming::update(int deltaTime)
 			sprite->position() += glm::vec2(0, 1);
 
 			for (int x = max(0.0f, sprite->position().x + 4.0f); x <= min(mask->width() - 1.0f, sprite->position().x + 10.0f); ++x) {
-				mask->setPixel(x + 120, sprite->position().y + 15, 0);
+				mask->setPixel(x /*+ 120*/, sprite->position().y + 15, 0);
 			}
 		}
 		break;
@@ -279,7 +279,7 @@ void Lemming::update(int deltaTime)
 			}
 			sprite->position() += glm::vec2(-1.0f, 0.0f);
 			for (int y = max(0.0f, sprite->position().y + 8.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 16.0f); ++y) {
-				mask->setPixel(sprite->position().x + 120 + 8.f, y, 0);
+				mask->setPixel(sprite->position().x /*+ 120*/ + 8.f, y, 0);
 			}
 		}
 		break;
@@ -298,7 +298,7 @@ void Lemming::update(int deltaTime)
 			}
 			sprite->position() += glm::vec2(1.0f, 0.0f);
 			for (int y = max(0.0f, sprite->position().y + 8.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 16.0f); ++y) {
-				mask->setPixel(sprite->position().x + 120.0f + 7.9f, y, 0);
+				mask->setPixel(sprite->position().x /*+ 120.0f*/ + 7.9f, y, 0);
 			}
 		}
 		break;
@@ -316,7 +316,7 @@ void Lemming::update(int deltaTime)
 
 			for (int x = max(0.0f, sprite->position().x + 2.0f); x <= min(mask->width() - 1.0f, sprite->position().x + 12.0f); ++x) {
 				for (int y = max(0.0f, sprite->position().y + 5.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 15.0f); ++y) {
-					if (mask->pixel(x + 120, y) == 0.0f) mask->setPixel(x + 120, y, blockerMask); // This will be an issue when we have the escavator as he might be able to escavate though a lemming
+					if (mask->pixel(x /*+ 120*/, y) == 0.0f) mask->setPixel(x /*+ 120*/, y, blockerMask); // This will be an issue when we have the escavator as he might be able to escavate though a lemming
 				}
 			}
 		}
@@ -414,7 +414,7 @@ void Lemming::update(int deltaTime)
 			sprite->changeAnimation(EXPLOSION);
 		}
 		if (sprite->explosionKeyframe()) {
-			PlaySound(TEXT("sounds/EXPLODE.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			Game::instance().playSound(EXPLODE, false);
 			float r = 10.0f;
 			glm::vec2 pos = sprite->position();
 			pos.x += 8;
@@ -424,12 +424,11 @@ void Lemming::update(int deltaTime)
 					glm::vec2 aux(x, y);
 					float dist = distance(pos, aux);
 					if (dist < r) {
-						mask->setPixel(x + 120, y, 0);
+						mask->setPixel(x /*+ 120*/, y, 0);
 					}
 				}			
 			}
 			state = DEAD_STATE;
-			PlaySound(TEXT("sounds/lemmings1.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		}
 	}
 }
@@ -459,7 +458,7 @@ int Lemming::collisionFloor(int maxFall)
 {
 	bool bContact = false;
 	int fall = 0;
-	glm::ivec2 posBase = sprite->position() + glm::vec2(120, 0); // Add the map displacement
+	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
 
 	if (collisionCeilling(3) == 1) {
 		cout << "collisionCeilling is 1" << endl;
@@ -485,7 +484,7 @@ int Lemming::collisionFloor(int maxFall)
 
 bool Lemming::collision()
 {
-	glm::ivec2 posBase = sprite->position() + glm::vec2(120, 0); // Add the map displacement
+	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
 	
 	posBase += glm::ivec2(7, 15);
 	if ((mask->pixel(posBase.x, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y - 1) == 0)) {
@@ -554,7 +553,7 @@ int Lemming::collisionCeilling(int max) {
 
 	bool bContact = false;
 	int fall = 0;
-	glm::ivec2 posBase = sprite->position() + glm::vec2(120, 0); // Add the map displacement
+	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
 
 	posBase += glm::ivec2(7, 0);
 	while ((fall < max) && !bContact)

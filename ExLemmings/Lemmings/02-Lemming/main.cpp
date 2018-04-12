@@ -2,12 +2,7 @@
 #include <GL/glut.h>
 #include "Game.h"
 
-#define _WIN32_WINNT 0x0500
-#include <windows.h>
-#include <mmsystem.h>
-#include <iostream>
-#include <fstream>
-#include <conio.h>
+#include <SFML/Audio.hpp>
 
 
 //Remove console (only works in Visual Studio)
@@ -117,8 +112,6 @@ int main(int argc, char **argv)
 	// Game instance initialization
 	Game::instance().init();
 	prevTime = glutGet(GLUT_ELAPSED_TIME);
-
-	PlaySound(TEXT("sounds/lemmings1.wav"), NULL, SND_FILENAME | SND_ASYNC);
 
 	// GLUT gains control of the application
 	glutMainLoop();

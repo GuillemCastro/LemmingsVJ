@@ -8,6 +8,8 @@
 #include "Lemming.h"
 #include "TexturedQuad.h"
 
+#define SCENE1_WIDTH 520
+#define SCENE1_HEIGHT 160
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -32,6 +34,7 @@ private:
 	void eraseMask(int mouseX, int mouseY);
 	void applyMask(int mouseX, int mouseY);
 	void powerSelect(int powerNumber);
+	void updateCamera();
 
 private:
 	Texture colorTexture;
@@ -52,6 +55,13 @@ private:
 	bool lemmingInit[10];
 	int numLemmingsAlive;
 	LemmingPower powerSelected;
+	int mouseX, mouseY;
+	struct {
+		float top;
+		float bottom;
+		float left;
+		float right;
+	} cameraPos;
 };
 
 

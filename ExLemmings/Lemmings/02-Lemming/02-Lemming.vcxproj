@@ -14,6 +14,7 @@
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="common_defs.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameSounds.h" />
     <ClInclude Include="Lemming.h" />
     <ClInclude Include="MaskedTexturedQuad.h" />
     <ClInclude Include="MenuScene.h" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameSounds.cpp" />
     <ClCompile Include="Lemming.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MaskedTexturedQuad.cpp" />
@@ -84,13 +86,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\libs\freeglut\include;..\..\libs\glew-1.13.0\include;..\..\libs\freetype-2.3.5-1-bin\include\freetype2;..\..\libs\freetype-2.3.5-1-bin\include;..\..\libs\glm;..\..\libs\Simple OpenGL Image Library\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\libs\SFML-2.4.2\include;..\..\libs\freeglut\include;..\..\libs\glew-1.13.0\include;..\..\libs\freetype-2.3.5-1-bin\include\freetype2;..\..\libs\freetype-2.3.5-1-bin\include;..\..\libs\glm;..\..\libs\Simple OpenGL Image Library\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libs\freetype-2.3.5-1-bin\include;..\..\libs\freetype-2.3.5-1-bin\lib;..\..\libs\freetype-2.3.5-1-bin;..\..\libs\freeglut\lib;..\..\libs\glew-1.13.0\lib\Release\Win32;..\..\libs\Simple OpenGL Image Library\projects\VC9\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;SOIL.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\libs\freetype-2.3.5-1-bin\include;..\..\libs\freetype-2.3.5-1-bin\lib;..\..\libs\freetype-2.3.5-1-bin;..\..\libs\freeglut\lib;..\..\libs\glew-1.13.0\lib\Release\Win32;..\..\libs\SFML-2.4.2\lib;..\..\libs\Simple OpenGL Image Library\projects\VC9\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;SOIL.lib;freetype.lib;sfml-audio-d.lib;sfml-system-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

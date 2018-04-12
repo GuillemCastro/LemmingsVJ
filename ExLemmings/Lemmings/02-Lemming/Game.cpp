@@ -11,6 +11,10 @@ void Game::init()
 	paused = false;
 	faster = false;
 	bLeftMouse = bRightMouse = false;
+
+	cout << "loading sounds " << sounds.init() << endl;
+	playSound(MUSIC1, true);
+
 	glClearColor(0.f, 0.f, 0.f, 1.f/*0.3f, 0.3f, 0.3f, 1.0f*/);
 
 	menuScene = new MenuScene();
@@ -55,7 +59,8 @@ bool Game::update(int deltaTime)
 					delete menuScene;
 					menuScene = NULL;
 				}
-
+				if (faster)
+					deltaTime *= 2;
 				scene1->update(deltaTime);
 				int ratio = VIEWPORT_HEIGHT / CAMERA_HEIGHT;
 				lemmingSelected = scene1->isALemmingAt(mouseX / ratio, mouseY / ratio);
@@ -295,6 +300,10 @@ int Game::timePerFrame() {
 	else {
 		return 1000.f / 30.f;
 	}
+}
+
+bool Game::playSound(Sound sound, bool loop) {
+	return sounds.play(sound, loop);
 }
 
 

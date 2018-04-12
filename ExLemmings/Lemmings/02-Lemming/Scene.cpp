@@ -29,8 +29,8 @@ Scene::~Scene()
 
 void Scene::init()
 {
-	glm::vec2 geom[2] = {glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT)-30)};
-	glm::vec2 texCoords[2] = {glm::vec2(120.f / 512.0, 0.f), glm::vec2((120.f + 320.f) / 512.0f, 160.f / 256.0f)};
+	glm::vec2 geom[2] = {glm::vec2(0.f, 0.f), glm::vec2(512.f/*float(CAMERA_WIDTH)*/, 256.f/*float(CAMERA_HEIGHT)-30*/)};
+	glm::vec2 texCoords[2] = {glm::vec2(/*120.f / 512.0*/0.f, 0.f), glm::vec2(/*(120.f + 320.f) / 512.0f*/1.f, /*160.f / 256.0f*/1.f)};
 	glm::vec2 geomButton[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), 30.f) };
 	glm::vec2 texCoordsButton[2] = { glm::vec2(0.0f,  0.0f), glm::vec2(1.f, 1.f) };
 
@@ -60,11 +60,13 @@ void Scene::init()
 	buttonsTexture.setMinFilter(GL_NEAREST);
 	buttonsTexture.setMagFilter(GL_NEAREST);
 
+	cameraPos = {0.0f, float(CAMERA_HEIGHT-1), 0.0f, float(CAMERA_WIDTH - 1) };
+
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 	
 	for (int i = 0; i < 10; ++i) {
-		lemmings[i].init(glm::vec2(60 + 10, 30), simpleTexProgram);
+		lemmings[i].init(glm::vec2(120 + 60 + 10, 10 + 30), simpleTexProgram);
 		lemmings[i].setMapMask(&maskTexture);
 		lemmings[i].setBridges(&bridgesTextureMask);
 		lemmingInit[i] = 0;
@@ -77,6 +79,7 @@ unsigned int x = 0;
 
 void Scene::update(int deltaTime)
 {
+	updateCamera();
 	numLemmingsAlive = 0;
 	currentTime += deltaTime;
 	int init = currentTime / 2000;
@@ -94,14 +97,6 @@ void Scene::update(int deltaTime)
 void Scene::render()
 {
 	glm::mat4 modelview;
-
-	buttonsTexProgram.use();
-	buttonsTexProgram.setUniformMatrix4f("projection", projection);
-	buttonsTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	modelview = glm::mat4(1.0f);
-	modelview = glm::translate(modelview, glm::vec3(0.f, float(CAMERA_HEIGHT) - 30.f, 0.f));
-	buttonsTexProgram.setUniformMatrix4f("modelview", modelview);
-	buttonQuad->render(buttonsTexture);
 
 	maskedTexProgram.use();
 	maskedTexProgram.setUniformMatrix4f("projection", projection);
@@ -128,6 +123,13 @@ void Scene::render()
 		}
 	}
 
+	buttonsTexProgram.use();
+	buttonsTexProgram.setUniformMatrix4f("projection", projection);
+	buttonsTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	modelview = glm::translate(modelview, glm::vec3(0.f + cameraPos.left, float(CAMERA_HEIGHT) - 30.f + cameraPos.top, 0.f));
+	buttonsTexProgram.setUniformMatrix4f("modelview", modelview);
+	buttonQuad->render(buttonsTexture);
 	
 }
 
@@ -169,14 +171,50 @@ void Scene::powerSelect(int powerNumber) {
 	return;
 }
 
+void Scene::updateCamera() {
+	if (mouseX >= CAMERA_WIDTH - 30) {
+		if (cameraPos.right < (SCENE1_WIDTH -1 )) {
+			cameraPos.left += 1;
+			cameraPos.right += 1;
+			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
+		}
+	}
+	if (mouseX <= 30) {
+		if (cameraPos.left > 1) {
+			cameraPos.left -= 1;
+			cameraPos.right -= 1;
+			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
+		}
+	}
+	if (mouseY >= CAMERA_HEIGHT - 60 && mouseY <= CAMERA_HEIGHT -30) {
+		if (cameraPos.bottom < SCENE1_HEIGHT-1) {
+			cameraPos.bottom += 1;
+			cameraPos.top += 1;
+			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
+		}
+	}
+	if (mouseY <= 30) {
+		if (cameraPos.top > 1) {
+			cameraPos.bottom -= 1;
+			cameraPos.top -= 1;
+			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
+		}
+	}
+	projection = glm::ortho(cameraPos.left, cameraPos.right, cameraPos.bottom, cameraPos.top);
+}
+
 void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
-	int x = mouseX / 3;
-	int y = mouseY / 3;
+	this->mouseX = mouseX / 3;
+	this->mouseY = mouseY / 3;
+
+	int x = this->mouseX + (cameraPos.left);
+	int y = this->mouseY + (cameraPos.top);
+
 	if (bLeftButton) {
 		cout << "clicked at " << mouseX/3 << " " << mouseY/3 << endl;
 
-		if (x >= 292 && x <= 320 && y >= 160 && y <= 190) {
+		if (this->mouseX >= 292 && this->mouseX <= 320 && this->mouseY >= 160 && this->mouseY <= 190) {
 			for (int i = 0; i < 10; ++i) {
 				if (lemmingInit[i]) {
 					lemmings[i].setPower(EXPLOADER);
@@ -184,10 +222,10 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			}
 		}
 
-		if (y > (CAMERA_HEIGHT-30) && y <= CAMERA_HEIGHT) {
+		if (this->mouseY > (CAMERA_HEIGHT-30) && this->mouseY <= CAMERA_HEIGHT) {
 
 			for (float i = 0.f; i < CAMERA_WIDTH; i += (CAMERA_WIDTH)/12) {
-				if (x >= i && x < (i + CAMERA_WIDTH / 12)) {
+				if (this->mouseX >= i && this->mouseX < (i + CAMERA_WIDTH / 12)) {
 					int powerNumber = (i / CAMERA_WIDTH) * 12 + 1;
 					powerSelect(powerNumber);
 				}
@@ -197,7 +235,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 		Lemming* selectedLemming;
 		bool selected = false;
 		for (int i = 0; i < 10; ++i) {
-			if (lemmings[i].insideCollisionBox(mouseX/3, mouseY/3)) {
+			if (lemmings[i].insideCollisionBox(x, y)) {
 				selected = true;
 				selectedLemming = &lemmings[i];
 			}
@@ -207,7 +245,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 		}
 	}
 
-	if (bRightButton) {
+	else if (bRightButton) {
 		cout << "clicked at " << mouseX / 3 << " " << mouseY / 3 << endl;
 		Lemming* selectedLemming;
 		bool selected = false;
@@ -221,6 +259,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			selectedLemming->setPower(BLOCKER);
 		}
 	}
+
 }
 
 void Scene::eraseMask(int mouseX, int mouseY)
@@ -229,7 +268,7 @@ void Scene::eraseMask(int mouseX, int mouseY)
 	
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX/3 + 120;
+	posX = mouseX/3 /*+ 120*/;
 	posY = mouseY/3;
 
 	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
@@ -243,7 +282,7 @@ void Scene::applyMask(int mouseX, int mouseY)
 	
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX/3 + 120;
+	posX = mouseX/3 /*+ 120*/;
 	posY = mouseY/3;
 
 	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
@@ -315,7 +354,7 @@ void Scene::initShaders()
 bool Scene::isALemmingAt(int x, int y) {
 	bool lemmingThere = false;
 	for (int i = 0; i < 10; ++i) {
-		if (lemmings[i].insideCollisionBox(x, y) && lemmingInit[i]) {
+		if (lemmings[i].insideCollisionBox(x + cameraPos.left, y + cameraPos.top) && lemmingInit[i]) {
 			lemmingThere = true;
 		}
 	}

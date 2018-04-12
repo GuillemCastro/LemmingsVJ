@@ -7,6 +7,7 @@
 #include "TexturedQuad.h"
 #include <iostream>
 #include "MenuScene.h"
+#include "GameSounds.h"
 
 
 // Game is a singleton (a class with a single instance) that represents our whole application
@@ -54,6 +55,8 @@ public:
 
 	int timePerFrame();
 
+	bool playSound(Sound sound, bool loop);
+
 private:
 
 	void initShaders();
@@ -72,6 +75,7 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	glm::mat4 projection;
 	GameScene state;
+	GameSounds sounds;
 
 	Texture cursorNormal;
 	Texture cursorSelected;
