@@ -6,17 +6,20 @@
 enum Sound {
 	MUSIC1 = 0,
 	EXPLODE,
+	DIE,
 
 	NUM_SOUNDS
 };
 
-class GameSounds
+class SoundManager
 {
 public:
-	GameSounds();
-	~GameSounds();
+	SoundManager();
+	~SoundManager();
 
 	bool init();
+
+	void update();
 
 	bool play(Sound sound, bool loop);
 
@@ -25,7 +28,7 @@ public:
 	bool stop(Sound sound);
 
 private:
-	sf::SoundBuffer* buffers[NUM_SOUNDS];
-	std::deque<sf::Sound*> sounds;
+	sf::SoundBuffer buffers[NUM_SOUNDS];
+	std::deque<sf::Sound> sounds[NUM_SOUNDS];
 };
 

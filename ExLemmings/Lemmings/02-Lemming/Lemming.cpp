@@ -14,7 +14,6 @@
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4
 
-
 enum LemmingAnims
 {
 	WALKING_LEFT, WALKING_RIGHT, UMBRELLA_RIGHT, UMBRELLA_LEFT, BLOCKING, DIGGING, DEATH, EXPLOSION, FALLING_RIGHT, FALLING_LEFT, BASHING_RIGHT, BASHING_LEFT
@@ -137,7 +136,6 @@ void Lemming::update(int deltaTime)
 			sprite->changeAnimation(UMBRELLA_LEFT);
 			break;
 		}
-
 		fall = collisionFloor(2);
 		if (fall > 0)
 			sprite->position() += glm::vec2(0, fall);
@@ -153,8 +151,8 @@ void Lemming::update(int deltaTime)
 				}
 				else {
 					fallHight = 0;
-					sprite->changeAnimation(WALKING_RIGHT);
-					state = WALKING_RIGHT_STATE;
+					sprite->changeAnimation(WALKING_LEFT);
+					state = WALKING_LEFT_STATE;
 					break;
 				}
 			}
@@ -191,13 +189,16 @@ void Lemming::update(int deltaTime)
 		break;
 	case WALKING_LEFT_STATE:
 		sprite->position() += glm::vec2(-1, -1);
-		if(collision())
+		if(collision(LEFT))
 		{
 			if (power == BASHER) {
 				state = BASHER_LEFT_STATE;
 			}
 			else if (power == CLIMBER && collisionCeilling(3) > 1) {
 				state = CLIMBER_LEFT_STATE;
+			}
+			else if (power == CLIMBER) {
+				cout << "climber but ceilling" << endl;
 			}
 			else {
 				sprite->position() -= glm::vec2(-1, -1);
@@ -219,7 +220,7 @@ void Lemming::update(int deltaTime)
 		break;
 	case WALKING_RIGHT_STATE:
 		sprite->position() += glm::vec2(1, -1);
-		if(collision())
+		if(collision(RIGHT))
 		{
 			if (power == BASHER) {
 				state = BASHER_RIGHT_STATE;
@@ -227,6 +228,9 @@ void Lemming::update(int deltaTime)
 			else if (power == CLIMBER && collisionCeilling(3) > 1) {
 				cout << "collisionCeilling " << collisionCeilling(3) << endl;
 				state = CLIMBER_RIGHT_STATE;
+			}
+			else if (power == CLIMBER) {
+				cout << "climber but ceilling" << endl;
 			}
 			else {
 				sprite->position() -= glm::vec2(1, -1);
@@ -323,83 +327,133 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case CLIMBER_LEFT_STATE: {
-		sprite->position() += glm::vec2(0.f, -1.f);
 		int ceilling = collisionCeilling(1);
 		fall = collisionFloor(2);
-		if (!collision()) {
+		bool col = collision(LEFT);
+		sprite->position() += glm::vec2(0.f, -1.f);
+		cout << "climbing..." << endl;
+		if (!col) {
+			sprite->position() += glm::vec2(0.f, 1.f);
+			cout << "CLIMBER LEFT no collision, changing to walking left" << endl;
 			state = WALKING_LEFT_STATE;
 			sprite->changeAnimation(WALKING_LEFT);
 		}
-		if (ceilling > 0) {
+		if (ceilling < 1) {
+			sprite->position() += glm::vec2(0.f, 1.f);
 			if (fall > 0) {
-				state = FALLING_LEFT_STATE;
-				sprite->changeAnimation(FALLING_LEFT);
+				if (col) {
+					state = FALLING_RIGHT_STATE;
+					sprite->changeAnimation(FALLING_RIGHT);
+					cout << "CLIMBER LEFT ceilling & fall, changing to falling right" << endl;
+				}
+				else {
+					state = FALLING_LEFT_STATE;
+					sprite->changeAnimation(FALLING_LEFT);
+					cout << "CLIMBER LEFT ceilling & fall, changing to falling left" << endl;
+				}
 			}
 			else {
-				state = WALKING_LEFT_STATE;
-				if (sprite->animation() != WALKING_LEFT)
-					sprite->changeAnimation(WALKING_LEFT);
+				if (col) {
+					cout << "CLIMBER LEFT ceilling but no fall, changing to walking right" << endl;
+					state = WALKING_RIGHT_STATE;
+					if (sprite->animation() != WALKING_RIGHT)
+						sprite->changeAnimation(WALKING_RIGHT);
+				}
+				else {
+					cout << "CLIMBER LEFT ceilling but no fall, changing to walking left" << endl;
+					state = WALKING_LEFT_STATE;
+					if (sprite->animation() != WALKING_LEFT)
+						sprite->changeAnimation(WALKING_LEFT);
+				}
 			}
 		}
 		break;
 	}
 	case CLIMBER_RIGHT_STATE: {
-		sprite->position() += glm::vec2(0.f, -1.f);
 		int ceilling = collisionCeilling(1);
 		fall = collisionFloor(2);
-		if (!collision()) {
+		bool col = collision(RIGHT);
+		sprite->position() += glm::vec2(0.f, -1.f);
+		cout << "climbing..." << endl;
+		if (!col) {
+			cout << "CLIMBER RIGHT no collision, changing to walking right" << endl;
 			state = WALKING_RIGHT_STATE;
 			sprite->changeAnimation(WALKING_RIGHT);
 		}
-		if (ceilling > 0) {
+		if (ceilling < 1) {
 			if (fall > 0) {
-				state = FALLING_RIGHT_STATE;
-				sprite->changeAnimation(FALLING_RIGHT);
+				if (col) {
+					cout << "CLIMBER RIGHT ceilling & fall, changing to falling left" << endl;
+					state = FALLING_LEFT_STATE;
+					sprite->changeAnimation(FALLING_LEFT);
+				}
+				else {
+					cout << "CLIMBER RIGHT ceilling & fall, changing to falling right" << endl;
+					state = FALLING_RIGHT_STATE;
+					sprite->changeAnimation(FALLING_RIGHT);
+				}
 			}
 			else {
-				state = WALKING_RIGHT_STATE;
-				if (sprite->animation() != WALKING_RIGHT)
-					sprite->changeAnimation(WALKING_RIGHT);
+				if (col) {
+					cout << "CLIMBER RIGHT ceilling but no fall, changing to walking left" << endl;
+					state = WALKING_LEFT_STATE;
+					if (sprite->animation() != WALKING_LEFT)
+						sprite->changeAnimation(WALKING_LEFT);
+				}
+				else {
+					cout << "CLIMBER RIGHT ceilling but no fall, changing to walking right" << endl;
+					state = WALKING_RIGHT_STATE;
+					if (sprite->animation() != WALKING_RIGHT)
+						sprite->changeAnimation(WALKING_RIGHT);
+				}
 			}
 		}
 		break;
 	}
 	case BUILDER_LEFT_STATE: {
-		if (builderCount >= 50) {
+		if (builderCount >= 50 || collisionCeilling(2) < 1) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_LEFT_STATE;
 			sprite->changeAnimation(WALKING_LEFT);
 		}
-		else if (collision()) {
+		else if (collision(LEFT)) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_RIGHT_STATE;
 			sprite->changeAnimation(WALKING_RIGHT);
 		}
 		else {
+			bridges->setPixel(sprite->position().x + 7 - 3, sprite->position().y + 16 - 1, 255);
 			sprite->position() += glm::vec2(-1.f, -1.f);
-			bridges->setPixel(sprite->position().x + 7, sprite->position().y + 16, 255);
+			int fall = collisionFloor(2);
+			if (fall > 0) {
+				sprite->position() += glm::vec2(0.f, 1.f);
+			}
 			builderCount += 1;
 		}
 		break;
 	}
 	case BUILDER_RIGHT_STATE: {
-		if (builderCount >= 50) {
+		if (builderCount >= 50 || collisionCeilling(2) < 1) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_RIGHT_STATE;
 			sprite->changeAnimation(WALKING_RIGHT);
 		}
-		else if (collision()) {
+		else if (collision(RIGHT)) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_LEFT_STATE;
 			sprite->changeAnimation(WALKING_LEFT);
 		}
 		else {
-			bridges->setPixel(sprite->position().x + 7, sprite->position().y + 16, 255);
+			bridges->setPixel(sprite->position().x + 7 + 3, sprite->position().y + 16 -1, 255);
 			sprite->position() += glm::vec2(1.f, -1.f);
+			int fall = collisionFloor(2);
+			if (fall > 0) {
+				sprite->position() += glm::vec2(0.f, 1.f);
+			}
 			builderCount += 1;
 		}
 		break;
@@ -482,24 +536,59 @@ int Lemming::collisionFloor(int maxFall)
 	return fall;
 }
 
-bool Lemming::collision()
+bool Lemming::collision(Direction direction)
 {
 	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
+
+	bool ret = false;
+
+	if (direction == LEFT) {
+		for (int i = 6; i < 14; ++i) {
+			if (mask->pixel(posBase.x + 5, posBase.y + i) == 255 && mask->pixel(posBase.x + 4, posBase.y + i) == 255) {
+				ret = true;
+			}
+			else if (!ignoreBlocker && mask->pixel(posBase.x + 5, posBase.y + i) == blockerMask && mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
+				ret = true;
+			}
+			else if (ignoreBlocker) {
+				ignoreBlocker = 0;
+			}
+		}
+	}
+	else if (direction == RIGHT) {
+		for (int i = 6; i < 14; ++i) {
+			if (mask->pixel(posBase.x + 11, posBase.y + i) == 255 && mask->pixel(posBase.x + 12, posBase.y + i) == 255) {
+				ret = true;
+			}
+			else if (!ignoreBlocker && mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask && mask->pixel(posBase.x + 12, posBase.y + i) == blockerMask) {
+				ret = true;
+			}
+			else if (ignoreBlocker) {
+				ignoreBlocker = 0;
+			}
+		}
+	}
+
+	return ret;
 	
-	posBase += glm::ivec2(7, 15);
+	/*posBase += glm::ivec2(7, 15);
 	if ((mask->pixel(posBase.x, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y - 1) == 0)) {
 		if (ignoreBlocker) ignoreBlocker = 0;
 		return false; // lemming can no longer fit though 1 pixel blocs, they now must have at least be 2 pixels with the mask set to 0 no not detect collision
 	}
 	else if (((mask->pixel(posBase.x, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y - 1) == blockerMask)) && (ignoreBlocker))
 		return false;  // so there are no bugs when lemmings fall on blockers
-	return true;
+	return true;*/
 }
 
 void Lemming::setPower(LemmingPower power) {
 
-	if (this->power == CLIMBER) {
-		return; // The climber is a permanent skill!
+	if (!this->isAlive()) {
+		return; //DEAD
+	}
+
+	if (this->power == CLIMBER && power != EXPLOADER) {
+		return; // The climber is a permanent skill! ... but we want it to explode
 	}
 
 	this->power = power;
@@ -555,7 +644,7 @@ int Lemming::collisionCeilling(int max) {
 	int fall = 0;
 	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
 
-	posBase += glm::ivec2(7, 0);
+	posBase += glm::ivec2(7, 5);
 	while ((fall < max) && !bContact)
 	{
 		if ((mask->pixel(posBase.x, posBase.y - fall) == 0))

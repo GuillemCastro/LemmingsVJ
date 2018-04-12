@@ -2,22 +2,22 @@
 #include <cmath>
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
-#include "Scene.h"
+#include "Scene2.h"
 
 
-Scene::Scene()
+Scene2::Scene2()
 {
 	map = NULL;
 	bridges = NULL;
 	buttonQuad = NULL;
 }
 
-Scene::~Scene()
+Scene2::~Scene2()
 {
 	map->free();
 	bridges->free();
 	buttonQuad->free();
-	if(map != NULL)
+	if (map != NULL)
 		delete map;
 	if (bridges != NULL)
 		delete bridges;
@@ -27,33 +27,33 @@ Scene::~Scene()
 }
 
 
-void Scene::init()
+void Scene2::init()
 {
 	faster = false;
 
-	glm::vec2 geom[2] = {glm::vec2(0.f, 0.f), glm::vec2(512.f/*float(CAMERA_WIDTH)*/, 256.f/*float(CAMERA_HEIGHT)-30*/)};
-	glm::vec2 texCoords[2] = {glm::vec2(/*120.f / 512.0*/0.f, 0.f), glm::vec2(/*(120.f + 320.f) / 512.0f*/1.f, /*160.f / 256.0f*/1.f)};
+	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(848.f/*float(CAMERA_WIDTH)*/, 160.f/*float(CAMERA_HEIGHT)-30*/) };
+	glm::vec2 texCoords[2] = { glm::vec2(/*120.f / 512.0*/0.f, 0.f), glm::vec2(/*(120.f + 320.f) / 512.0f*/1.f, /*160.f / 256.0f*/1.f) };
 	glm::vec2 geomButton[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), 30.f) };
 	glm::vec2 texCoordsButton[2] = { glm::vec2(0.0f,  0.0f), glm::vec2(1.f, 1.f) };
 
 	initShaders();
 
 	map = MaskedTexturedQuad::createTexturedQuad(geom, texCoords, maskedTexProgram);
-	colorTexture.loadFromFile("images/fun1.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	cout << "loading fun5 " << colorTexture.loadFromFile("images/fun5.png", TEXTURE_PIXEL_FORMAT_RGBA) << endl;
 	colorTexture.setMinFilter(GL_NEAREST);
 	colorTexture.setMagFilter(GL_NEAREST);
-	maskTexture.loadFromFile("images/fun1_mask.png", TEXTURE_PIXEL_FORMAT_L);
+	cout << "loading fun5 mask " << maskTexture.loadFromFile("images/fun5_mask.png", TEXTURE_PIXEL_FORMAT_L) << endl;
 	maskTexture.setMinFilter(GL_NEAREST);
 	maskTexture.setMagFilter(GL_NEAREST);
 
-	glm::vec2 texCoordsBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(1.f, 1.f) };
-	glm::vec2 geomBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(512.f, 256.f) };
+	glm::vec2 texCoordsBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(1.0f, 1.0f) };
+	glm::vec2 geomBridge[2] = { glm::vec2(0.0f, 0.f), glm::vec2(848.f, 160.f) };
 
 	bridges = MaskedTexturedQuad::createTexturedQuad(geomBridge, texCoordsBridge, maskedTexProgram);
-	bridgeColorTexture.loadFromFile("images/bridge_fun1.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	bridgeColorTexture.loadFromFile("images/bridge_fun5.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	bridgeColorTexture.setMinFilter(GL_NEAREST);
 	bridgeColorTexture.setMagFilter(GL_NEAREST);
-	bridgesTextureMask.loadFromFile("images/bridge_mask_fun1.png", TEXTURE_PIXEL_FORMAT_L);
+	bridgesTextureMask.loadFromFile("images/bridge_mask_fun5.png", TEXTURE_PIXEL_FORMAT_L);
 	bridgesTextureMask.setMinFilter(GL_NEAREST);
 	bridgesTextureMask.setMagFilter(GL_NEAREST);
 
@@ -62,11 +62,11 @@ void Scene::init()
 	buttonsTexture.setMinFilter(GL_NEAREST);
 	buttonsTexture.setMagFilter(GL_NEAREST);
 
-	cameraPos = {0.0f, float(CAMERA_HEIGHT-1), 0.0f, float(CAMERA_WIDTH - 1) };
+	cameraPos = { 0.0f, float(CAMERA_HEIGHT - 1), 0.0f, float(CAMERA_WIDTH - 1) };
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	
+
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(120 + 60 + 10, 10 + 30), simpleTexProgram);
 		lemmings[i].setMapMask(&maskTexture);
@@ -77,9 +77,7 @@ void Scene::init()
 
 }
 
-//unsigned int x = 0;
-
-void Scene::update(int deltaTime)
+void Scene2::update(int deltaTime)
 {
 	if (faster)
 		deltaTime *= 2;
@@ -98,7 +96,7 @@ void Scene::update(int deltaTime)
 	}
 }
 
-void Scene::render()
+void Scene2::render()
 {
 	glm::mat4 modelview;
 
@@ -115,7 +113,7 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
 	bridges->render(maskedTexProgram, bridgeColorTexture, bridgesTextureMask);
-	
+
 	for (int i = 0; i < 10; ++i) {
 		if (lemmingInit[i]) {
 			simpleTexProgram.use();
@@ -134,80 +132,86 @@ void Scene::render()
 	modelview = glm::translate(modelview, glm::vec3(0.f + cameraPos.left, float(CAMERA_HEIGHT) - 30.f + cameraPos.top, 0.f));
 	buttonsTexProgram.setUniformMatrix4f("modelview", modelview);
 	buttonQuad->render(buttonsTexture);
-	
+
 }
 
-void Scene::powerSelect(int powerNumber) {
+void Scene2::powerSelect(int powerNumber) {
 	switch (powerNumber) {
-		case 2: {
-			powerSelected = CLIMBER;
-			break;
-		}
-		case 3: {
-			powerSelected = UMBRELLA;
-			break;
-		}
-		case 4: {
-			powerSelected = EXPLOADER;
-			break;
-		}
-		case 5: {
-			powerSelected = BLOCKER;
-			break;
-		}
-		case 6: {
-			powerSelected = BUILDER;
-			break;
-		}
-		case 7: {
-			powerSelected = BASHER;
-			break;
-		}
-		case 9: {
-			powerSelected = DIGGER;
-			break;
-		}
-		default: {
-			powerSelected = NONE;
-			break;
-		}
+	case 2: {
+		powerSelected = CLIMBER;
+		break;
+	}
+	case 3: {
+		powerSelected = UMBRELLA;
+		break;
+	}
+	case 4: {
+		powerSelected = EXPLOADER;
+		break;
+	}
+	case 5: {
+		powerSelected = BLOCKER;
+		break;
+	}
+	case 6: {
+		powerSelected = BUILDER;
+		break;
+	}
+	case 7: {
+		powerSelected = BASHER;
+		break;
+	}
+	case 9: {
+		powerSelected = DIGGER;
+		break;
+	}
+	default: {
+		powerSelected = NONE;
+		break;
+	}
 	}
 	return;
 }
 
-void Scene::updateCamera() {
+void Scene2::updateCamera() {
+	bool edited = false;
 	if (mouseX >= CAMERA_WIDTH - 30) {
-		if (cameraPos.right < (SCENE1_WIDTH -1 )) {
+		if (cameraPos.right < (SCENE2_WIDTH - 1)) {
 			cameraPos.left += 1;
 			cameraPos.right += 1;
-			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
+			edited = true;
+			cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
 		}
 	}
 	if (mouseX <= 30) {
 		if (cameraPos.left > 1) {
 			cameraPos.left -= 1;
 			cameraPos.right -= 1;
-			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
+			edited = true;
+			cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
 		}
 	}
-	if (mouseY >= CAMERA_HEIGHT - 60 && mouseY <= CAMERA_HEIGHT -30) {
-		if (cameraPos.bottom < SCENE1_HEIGHT-1) {
+	if (mouseY >= CAMERA_HEIGHT - 60 && mouseY <= CAMERA_HEIGHT - 30) {
+		if (cameraPos.bottom < SCENE2_HEIGHT - 1) {
 			cameraPos.bottom += 1;
 			cameraPos.top += 1;
-			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
+			edited = true;
+			cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
 		}
 	}
 	if (mouseY <= 30) {
 		if (cameraPos.top > 1) {
 			cameraPos.bottom -= 1;
 			cameraPos.top -= 1;
-			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
+			edited = true;
+			cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
 		}
 	}
-	projection = glm::ortho(cameraPos.left, cameraPos.right, cameraPos.bottom, cameraPos.top);
+	if (edited)
+		projection = glm::ortho(cameraPos.left, cameraPos.right, cameraPos.bottom, cameraPos.top);
 }
 
-void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
+void Scene2::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)
 {
 	this->mouseX = mouseX / 3;
 	this->mouseY = mouseY / 3;
@@ -216,7 +220,7 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 	int y = this->mouseY + (cameraPos.top);
 
 	if (bLeftButton) {
-		cout << "clicked at " << mouseX/3 << " " << mouseY/3 << endl;
+		//cout << "clicked at " << mouseX / 3 << " " << mouseY / 3 << endl;
 
 		if (this->mouseX >= 292 && this->mouseX <= 320 && this->mouseY >= 160 && this->mouseY <= 190) {
 			for (int i = 0; i < 10; ++i) {
@@ -230,9 +234,9 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			this->faster = !faster;
 		}
 
-		if (this->mouseY > (CAMERA_HEIGHT-30) && this->mouseY <= CAMERA_HEIGHT) {
+		if (this->mouseY > (CAMERA_HEIGHT - 30) && this->mouseY <= CAMERA_HEIGHT) {
 
-			for (float i = 0.f; i < CAMERA_WIDTH; i += (CAMERA_WIDTH)/12) {
+			for (float i = 0.f; i < CAMERA_WIDTH; i += (CAMERA_WIDTH) / 12) {
 				if (this->mouseX >= i && this->mouseX < (i + CAMERA_WIDTH / 12)) {
 					int powerNumber = (i / CAMERA_WIDTH) * 12 + 1;
 					powerSelect(powerNumber);
@@ -270,46 +274,46 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 
 }
 
-void Scene::eraseMask(int mouseX, int mouseY)
+void Scene2::eraseMask(int mouseX, int mouseY)
 {
 	int posX, posY;
-	
+
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX/3 /*+ 120*/;
-	posY = mouseY/3;
+	posX = mouseX / 3 /*+ 120*/;
+	posY = mouseY / 3;
 
-	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
-		for(int x=max(0, posX-3); x<=min(maskTexture.width()-1, posX+3); x++)
+	for (int y = max(0, posY - 3); y <= min(maskTexture.height() - 1, posY + 3); y++)
+		for (int x = max(0, posX - 3); x <= min(maskTexture.width() - 1, posX + 3); x++)
 			maskTexture.setPixel(x, y, 0);
 }
 
-void Scene::applyMask(int mouseX, int mouseY)
+void Scene2::applyMask(int mouseX, int mouseY)
 {
 	int posX, posY;
-	
+
 	// Transform from mouse coordinates to map coordinates
 	//   The map is enlarged 3 times and displaced 120 pixels
-	posX = mouseX/3 /*+ 120*/;
-	posY = mouseY/3;
+	posX = mouseX / 3 /*+ 120*/;
+	posY = mouseY / 3;
 
-	for(int y=max(0, posY-3); y<=min(maskTexture.height()-1, posY+3); y++)
-		for(int x=max(0, posX-3); x<=min(maskTexture.width()-1, posX+3); x++)
+	for (int y = max(0, posY - 3); y <= min(maskTexture.height() - 1, posY + 3); y++)
+		for (int x = max(0, posX - 3); x <= min(maskTexture.width() - 1, posX + 3); x++)
 			maskTexture.setPixel(x, y, 255);
 }
 
-void Scene::initShaders()
+void Scene2::initShaders()
 {
 	Shader vShader, fShader;
 
 	vShader.initFromFile(VERTEX_SHADER, "shaders/texture.vert");
-	if(!vShader.isCompiled())
+	if (!vShader.isCompiled())
 	{
 		cout << "Vertex Shader Error" << endl;
 		cout << "" << vShader.log() << endl << endl;
 	}
 	fShader.initFromFile(FRAGMENT_SHADER, "shaders/texture.frag");
-	if(!fShader.isCompiled())
+	if (!fShader.isCompiled())
 	{
 		cout << "Fragment Shader Error" << endl;
 		cout << "" << fShader.log() << endl << endl;
@@ -324,7 +328,7 @@ void Scene::initShaders()
 	buttonsTexProgram.addShader(fShader);
 	buttonsTexProgram.link();
 
-	if(!simpleTexProgram.isLinked())
+	if (!simpleTexProgram.isLinked())
 	{
 		cout << "Shader Linking Error" << endl;
 		cout << "" << simpleTexProgram.log() << endl << endl;
@@ -334,13 +338,13 @@ void Scene::initShaders()
 	fShader.free();
 
 	vShader.initFromFile(VERTEX_SHADER, "shaders/maskedTexture.vert");
-	if(!vShader.isCompiled())
+	if (!vShader.isCompiled())
 	{
 		cout << "Vertex Shader Error" << endl;
 		cout << "" << vShader.log() << endl << endl;
 	}
 	fShader.initFromFile(FRAGMENT_SHADER, "shaders/maskedTexture.frag");
-	if(!fShader.isCompiled())
+	if (!fShader.isCompiled())
 	{
 		cout << "Fragment Shader Error" << endl;
 		cout << "" << fShader.log() << endl << endl;
@@ -349,7 +353,7 @@ void Scene::initShaders()
 	maskedTexProgram.addShader(vShader);
 	maskedTexProgram.addShader(fShader);
 	maskedTexProgram.link();
-	if(!maskedTexProgram.isLinked())
+	if (!maskedTexProgram.isLinked())
 	{
 		cout << "Shader Linking Error" << endl;
 		cout << "" << maskedTexProgram.log() << endl << endl;
@@ -359,7 +363,7 @@ void Scene::initShaders()
 	fShader.free();
 }
 
-bool Scene::isALemmingAt(int x, int y) {
+bool Scene2::isALemmingAt(int x, int y) {
 	bool lemmingThere = false;
 	for (int i = 0; i < 10; ++i) {
 		if (lemmings[i].insideCollisionBox(x + cameraPos.left, y + cameraPos.top) && lemmingInit[i]) {

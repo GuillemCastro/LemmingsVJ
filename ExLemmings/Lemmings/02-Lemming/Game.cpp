@@ -42,6 +42,7 @@ void Game::init()
 
 bool Game::update(int deltaTime)
 {
+	this->sounds.update();
 	if (!paused) {
 		switch (state) {
 			case MENU: {
@@ -59,11 +60,19 @@ bool Game::update(int deltaTime)
 					delete menuScene;
 					menuScene = NULL;
 				}
-				if (faster)
-					deltaTime *= 2;
 				scene1->update(deltaTime);
 				int ratio = VIEWPORT_HEIGHT / CAMERA_HEIGHT;
 				lemmingSelected = scene1->isALemmingAt(mouseX / ratio, mouseY / ratio);
+				break;
+			}
+			case SCENE2: {
+				if (menuScene != NULL) {
+					delete menuScene;
+					menuScene = NULL;
+				}
+				scene2->update(deltaTime);
+				int ratio = VIEWPORT_HEIGHT / CAMERA_HEIGHT;
+				lemmingSelected = scene2->isALemmingAt(mouseX / ratio, mouseY / ratio);
 				break;
 			}
 		}
@@ -81,6 +90,10 @@ void Game::render()
 		}
 		case SCENE1: {
 			scene1->render();
+			break;
+		}
+		case SCENE2: {
+			scene2->render();
 		}
 	}
 	if (paused) {
@@ -167,6 +180,10 @@ void Game::mouseMove(int x, int y)
 			scene1->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 			break;
 		}
+		case SCENE2: {
+			scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+			break;
+		}
 	}
 }
 
@@ -185,6 +202,10 @@ void Game::mousePress(int button)
 				scene1->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
+			case SCENE2: {
+				scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
+			}
 		}
 	}
 	else if(button == GLUT_RIGHT_BUTTON)
@@ -197,6 +218,10 @@ void Game::mousePress(int button)
 			}
 			case SCENE1: {
 				scene1->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
+			}
+			case SCENE2: {
+				scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
 		}
@@ -235,6 +260,10 @@ void Game::changeScene(GameScene scene) {
 		case SCENE1:
 			this->scene1 = new Scene;
 			this->scene1->init();
+			break;
+		case SCENE2:
+			this->scene2 = new Scene2;
+			this->scene2->init();
 			break;
 	}
 }

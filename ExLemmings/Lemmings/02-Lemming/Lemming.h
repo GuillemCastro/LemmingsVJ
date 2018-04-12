@@ -14,6 +14,10 @@ enum LemmingPower {
 	NONE, DIGGER, BASHER, CLIMBER, BUILDER, BLOCKER, WALKER, EXPLOADER, UMBRELLA
 };
 
+enum Direction {
+	LEFT, RIGHT, UP, DOWN
+};
+
 class Lemming
 {
 
@@ -34,7 +38,7 @@ public:
 	
 private:
 	int collisionFloor(int maxFall);
-	bool collision();
+	bool collision(Direction direction);
 	int collisionCeilling(int max);
 	
 	

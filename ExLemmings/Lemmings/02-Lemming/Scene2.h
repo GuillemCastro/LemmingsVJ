@@ -1,5 +1,5 @@
-#ifndef _SCENE_INCLUDE
-#define _SCENE_INCLUDE
+#ifndef _SCENE2_INCLUDE
+#define _SCENE2_INCLUDE
 
 
 #include <glm/glm.hpp>
@@ -8,19 +8,19 @@
 #include "Lemming.h"
 #include "TexturedQuad.h"
 
-#define SCENE1_WIDTH 520
-#define SCENE1_HEIGHT 160
+#define SCENE2_WIDTH 848
+#define SCENE2_HEIGHT 160
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
 
-class Scene
+class Scene2
 {
 
 public:
-	Scene();
-	~Scene();
+	Scene2();
+	~Scene2();
 
 	void init();
 	void update(int deltaTime);
@@ -66,5 +66,5 @@ private:
 };
 
 
-#endif // _SCENE_INCLUDE
+#endif
 

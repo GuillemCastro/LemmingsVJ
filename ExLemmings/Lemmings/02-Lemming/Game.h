@@ -7,7 +7,8 @@
 #include "TexturedQuad.h"
 #include <iostream>
 #include "MenuScene.h"
-#include "GameSounds.h"
+#include "SoundManager.h"
+#include "Scene2.h"
 
 
 // Game is a singleton (a class with a single instance) that represents our whole application
@@ -22,6 +23,7 @@ class Game
 public:
 	Game() {
 		this->scene1 = NULL;
+		this->scene2 = NULL;
 		this->menuScene = NULL;
 	}
 	
@@ -64,6 +66,7 @@ private:
 	bool bPlay;                       // Continue to play game?
 	bool paused;					  // Game paused?
 	Scene* scene1;                      // Scene to render
+	Scene2* scene2;
 	MenuScene* menuScene;
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time
@@ -75,7 +78,7 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	glm::mat4 projection;
 	GameScene state;
-	GameSounds sounds;
+	SoundManager sounds;
 
 	Texture cursorNormal;
 	Texture cursorSelected;
