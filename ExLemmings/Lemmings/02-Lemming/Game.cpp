@@ -13,7 +13,7 @@ void Game::init()
 	bLeftMouse = bRightMouse = false;
 
 	cout << "loading sounds " << sounds.init() << endl;
-	playSound(MUSIC1, true);
+	//playSound(MUSIC1, true);
 
 	glClearColor(0.f, 0.f, 0.f, 1.f/*0.3f, 0.3f, 0.3f, 1.0f*/);
 
@@ -250,6 +250,14 @@ void Game::changeScene(GameScene scene) {
 	if (this->state == scene) {
 		return;
 	}
+	switch (state) {
+		case SCENE1:
+			this->scene1->stop();
+			break;
+		case SCENE2:
+			this->scene2->stop();
+			break;
+	}
 	state = scene;
 	paused = false;
 	switch (scene) {
@@ -333,6 +341,10 @@ int Game::timePerFrame() {
 
 bool Game::playSound(Sound sound, bool loop) {
 	return sounds.play(sound, loop);
+}
+
+SoundManager& Game::getSoundManager() {
+	return sounds;
 }
 
 

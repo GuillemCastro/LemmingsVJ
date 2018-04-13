@@ -4,6 +4,7 @@
 
 SoundManager::SoundManager()
 {
+	uniqueID = 1;
 }
 
 
@@ -12,45 +13,82 @@ SoundManager::~SoundManager()
 }
 
 bool SoundManager::init() {
-	buffers[MUSIC1].loadFromFile("sounds/lemmings1.wav");
-	//sounds[MUSIC1] = sf::Sound(buffers[MUSIC1]);
+	buffers[MUSIC1].loadFromFile("sounds/lemmings1.ogg");
 
 	buffers[EXPLODE].loadFromFile("sounds/EXPLODE.WAV");
 
 	buffers[DIE].loadFromFile("sounds/DIE.WAV");
-	//sounds[EXPLODE] = sf::Sound(buffers[EXPLODE]);
+
+	buffers[MUSIC2].loadFromFile("sounds/lemmings2.ogg");
+
+	buffers[LETSGO].loadFromFile("sounds/LETSGO2.WAV");
+
 	return true;
 }
 
-bool SoundManager::play(Sound sound, bool loop) {
+const int SoundManager::play(Sound sound, bool loop) {
 	if (sound >= NUM_SOUNDS || sound < 0)
-		return false;
+		return 0;
 	std::cout << "playing" << sound << std::endl;
-	sounds[sound].push_back(sf::Sound(buffers[sound]));
-	sounds[sound].back().setVolume(100);
-	sounds[sound].back().setLoop(loop);
-	sounds[sound].back().play();
+	SoundInfo soundInfo = { uniqueID, sf::Sound(buffers[sound])};
+	sounds[sound].push_back(soundInfo);
+	sounds[sound].back().sound.setVolume(100);
+	sounds[sound].back().sound.setLoop(loop);
+	sounds[sound].back().sound.play();
+	++uniqueID;
+	return sounds[sound].back().id;
+}
+
+bool SoundManager::stop(Sound sound, int id) {
+	if (sound >= NUM_SOUNDS || sound < 0)
+		return false;
+	for (int i = 0; i < sounds[sound].size(); ++i) {
+		if (sounds[sound].at(i).id == id) {
+			sounds[sound].at(i).sound.stop();
+		}
+	}
 	return true;
 }
 
-bool SoundManager::stop(Sound sound) {
+bool SoundManager::pause(Sound sound, int id) {
 	if (sound >= NUM_SOUNDS || sound < 0)
 		return false;
-	//sounds[sound].stop();
-	return true;
-}
-
-bool SoundManager::pause(Sound sound) {
-	if (sound >= NUM_SOUNDS || sound < 0)
-		return false;
-	//sounds[sound].pause();
+	for (int i = 0; i < sounds[sound].size(); ++i) {
+		if (sounds[sound].at(i).id == id) {
+			sounds[sound].at(i).sound.pause();
+		}
+	}
 	return true;
 }
 
 void SoundManager::update() {
 	for (int i = 0; i < NUM_SOUNDS; ++i) {
-		while (!sounds[i].empty() && sounds[i].front().getStatus() == sf::SoundSource::Status::Stopped) {
+		while (!sounds[i].empty() && sounds[i].front().sound.getStatus() == sf::SoundSource::Status::Stopped) {
 			sounds[i].pop_front();
 		}
 	}
+}
+
+bool SoundManager::isPlaying(Sound sound, int id) {
+	if (sound >= NUM_SOUNDS || sound < 0)
+		return false;
+	bool ret = false;
+	for (int i = 0; i < sounds[sound].size(); ++i) {
+		if (sounds[sound].at(i).id == id) {
+			ret = sounds[sound].at(i).sound.getStatus() == sf::SoundSource::Status::Playing;
+		}
+	}
+	return ret;
+}
+
+bool SoundManager::isStopped(Sound sound, int id) {
+	if (sound >= NUM_SOUNDS || sound < 0)
+		return false;
+	bool ret = false;
+	for (int i = 0; i < sounds[sound].size(); ++i) {
+		if (sounds[sound].at(i).id == id) {
+			ret = sounds[sound].at(i).sound.getStatus() == sf::SoundSource::Status::Stopped;
+		}
+	}
+	return ret;
 }

@@ -7,8 +7,15 @@ enum Sound {
 	MUSIC1 = 0,
 	EXPLODE,
 	DIE,
+	MUSIC2,
+	LETSGO,
 
 	NUM_SOUNDS
+};
+
+struct SoundInfo {
+	int id;
+	sf::Sound sound;
 };
 
 class SoundManager
@@ -21,14 +28,22 @@ public:
 
 	void update();
 
-	bool play(Sound sound, bool loop);
+	const int play(Sound sound, bool loop);
 
-	bool pause(Sound sound);
+	bool pause(Sound sound, int id);
 
-	bool stop(Sound sound);
+	bool stop(Sound sound, int id);
+
+	bool isPlaying(Sound sound, int id);
+
+	bool isStopped(Sound sound, int id);
+
+private:
+
+	int uniqueID;
 
 private:
 	sf::SoundBuffer buffers[NUM_SOUNDS];
-	std::deque<sf::Sound> sounds[NUM_SOUNDS];
+	std::deque<SoundInfo> sounds[NUM_SOUNDS];
 };
 

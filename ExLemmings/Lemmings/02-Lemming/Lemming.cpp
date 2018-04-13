@@ -25,6 +25,7 @@ void Lemming::init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgra
 	state = WALKING_RIGHT_STATE;
 	power = NONE;
 	initalized = 1;
+	playDie = true;
 	builderCount = 0;
 	fallHight = 0;
 	spritesheet.loadFromFile("images/lemming_spritesheet.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -206,7 +207,7 @@ void Lemming::update(int deltaTime)
 				state = WALKING_RIGHT_STATE;
 			}
 		}
-		else if (bridges->pixel(sprite->position().x + 7, sprite->position().y + 16) == 0) {
+		if (bridges->pixel(sprite->position().x + 7, sprite->position().y + 16) == 0) {
 			fall = collisionFloor(3);
 			if(fall > 0)
 				sprite->position() += glm::vec2(0, 1);
@@ -223,6 +224,7 @@ void Lemming::update(int deltaTime)
 		if(collision(RIGHT))
 		{
 			if (power == BASHER) {
+				cout << "collision right, changing to basher" << endl;
 				state = BASHER_RIGHT_STATE;
 			}
 			else if (power == CLIMBER && collisionCeilling(3) > 1) {
@@ -238,7 +240,7 @@ void Lemming::update(int deltaTime)
 				state = WALKING_LEFT_STATE;
 			}
 		}
-		else if (bridges->pixel(sprite->position().x + 7, sprite->position().y + 16) == 0) {
+		if (bridges->pixel(sprite->position().x + 7, sprite->position().y + 16) == 0) {
 			fall = collisionFloor(3);
 			if (fall > 0)
 				sprite->position() += glm::vec2(0, 1);
@@ -272,18 +274,28 @@ void Lemming::update(int deltaTime)
 
 	case BASHER_LEFT_STATE: {
 		fall = collisionFloor(2);
-		if (fall > 0) {
+		bool col = collision(LEFT, 16);
+		bool stopper = collisionStopper(LEFT);
+		if (fall > 1) {
 			state = FALLING_LEFT_STATE;
 			power = NONE;
 			sprite->changeAnimation(FALLING_LEFT);
+		}
+		else if (!col || stopper) {
+			state = WALKING_LEFT_STATE;
+			power = NONE;
+			sprite->changeAnimation(WALKING_LEFT);
 		}
 		else {
 			if (sprite->animation() != BASHING_LEFT) {
 				//change to bashing left
 			}
 			sprite->position() += glm::vec2(-1.0f, 0.0f);
-			for (int y = max(0.0f, sprite->position().y + 8.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 16.0f); ++y) {
-				mask->setPixel(sprite->position().x /*+ 120*/ + 8.f, y, 0);
+			if (fall > 0) {
+				//sprite->position() += glm::vec2(0.f, 1.f);
+			}
+			for (int y = max(0.0f, sprite->position().y + 5.0f); y <= min(mask->height()*1.f, sprite->position().y + 15.0f); ++y) {
+				mask->setPixel(sprite->position().x /*+ 120*/ + 7.f, y, 0);
 			}
 		}
 		break;
@@ -291,25 +303,37 @@ void Lemming::update(int deltaTime)
 
 	case BASHER_RIGHT_STATE: {
 		fall = collisionFloor(2);
-		if (fall > 0) {
+		bool col = collision(RIGHT, 16);
+		bool stopper = collisionStopper(RIGHT);
+		if (fall > 1) {
+			cout << "fall, changing to falling" << endl;
 			state = FALLING_RIGHT_STATE;
 			power = NONE;
 			sprite->changeAnimation(FALLING_RIGHT);
+		}
+		else if (!col || stopper) {
+			cout << "no col, changing to walker" << endl;
+			state = WALKING_RIGHT_STATE;
+			power = NONE;
+			sprite->changeAnimation(WALKING_RIGHT);
 		}
 		else {
 			if (sprite->animation() != BASHING_RIGHT) {
 				//change to bashing RIGHT
 			}
 			sprite->position() += glm::vec2(1.0f, 0.0f);
-			for (int y = max(0.0f, sprite->position().y + 8.0f); y <= min(mask->height() - 1.0f, sprite->position().y + 16.0f); ++y) {
-				mask->setPixel(sprite->position().x /*+ 120.0f*/ + 7.9f, y, 0);
+			if (fall > 0) {
+				//sprite->position() += glm::vec2(0.f, 1.f);
+			}
+			for (int y = max(0.0f, sprite->position().y + 5.0f); y <= min(mask->height() * 1.0f, sprite->position().y + 15.0f); ++y) {
+				mask->setPixel(sprite->position().x /*+ 120.0f*/ + 8.f, y, 0);
 			}
 		}
 		break;
 	}
 	case BLOCKER_STATE: {
 		fall = collisionFloor(2);
-		if (fall > 0) {
+		if (fall > 1) {
 			state = FALLING_RIGHT_STATE;
 			sprite->changeAnimation(FALLING_RIGHT_STATE);
 		}
@@ -459,8 +483,12 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case DEAD_STATE:
+		if (alive && playDie && power != EXPLOADER) {
+			Game::instance().playSound(DIE, false);
+			playDie = false;
+		}
 		if (sprite->deathKeyframe()) {
-			alive = 0;
+			alive = false;
 		}
 		break;
 	case EXPLOAD_STATE:
@@ -484,12 +512,19 @@ void Lemming::update(int deltaTime)
 			}
 			state = DEAD_STATE;
 		}
+		break;
 	}
+
+	if (state != DEAD_STATE && alive && (sprite->position().y + 15.f >= mask->height() || sprite->position().y + 15 <= 0.f ||
+		sprite->position().x + 7 >= mask->width() ||sprite->position().x + 7 < 0)) {
+		state = DEAD_STATE;
+		sprite->changeAnimation(DEATH);
+	}
+
 }
 
 void Lemming::render()
 {
-	alive = 1;
 	sprite->render();
 }
 
@@ -515,7 +550,7 @@ int Lemming::collisionFloor(int maxFall)
 	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
 
 	if (collisionCeilling(3) == 1) {
-		cout << "collisionCeilling is 1" << endl;
+		//cout << "collisionCeilling is 1" << endl;
 		return 1;
 	}
 	
@@ -543,11 +578,11 @@ bool Lemming::collision(Direction direction)
 	bool ret = false;
 
 	if (direction == LEFT) {
-		for (int i = 6; i < 14; ++i) {
-			if (mask->pixel(posBase.x + 5, posBase.y + i) == 255 && mask->pixel(posBase.x + 4, posBase.y + i) == 255) {
+		for (int i = 7; i < 14; ++i) {
+			if (mask->pixel(posBase.x + 6, posBase.y + i) == 255 || mask->pixel(posBase.x + 6, posBase.y + i) == 255) {
 				ret = true;
 			}
-			else if (!ignoreBlocker && mask->pixel(posBase.x + 5, posBase.y + i) == blockerMask && mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
+			else if (!ignoreBlocker && mask->pixel(posBase.x + 3, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
 				ret = true;
 			}
 			else if (ignoreBlocker) {
@@ -556,11 +591,11 @@ bool Lemming::collision(Direction direction)
 		}
 	}
 	else if (direction == RIGHT) {
-		for (int i = 6; i < 14; ++i) {
-			if (mask->pixel(posBase.x + 11, posBase.y + i) == 255 && mask->pixel(posBase.x + 12, posBase.y + i) == 255) {
+		for (int i = 7; i < 14; ++i) {
+			if (mask->pixel(posBase.x + 8, posBase.y + i) == 255 || mask->pixel(posBase.x + 9, posBase.y + i) == 255) {
 				ret = true;
 			}
-			else if (!ignoreBlocker && mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask && mask->pixel(posBase.x + 12, posBase.y + i) == blockerMask) {
+			else if (!ignoreBlocker && mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask && mask->pixel(posBase.x + 10, posBase.y + i) == blockerMask) {
 				ret = true;
 			}
 			else if (ignoreBlocker) {
@@ -579,6 +614,81 @@ bool Lemming::collision(Direction direction)
 	else if (((mask->pixel(posBase.x, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y - 1) == blockerMask)) && (ignoreBlocker))
 		return false;  // so there are no bugs when lemmings fall on blockers
 	return true;*/
+}
+
+bool Lemming::collision(Direction direction, int bottom)
+{
+	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
+
+	bool ret = false;
+
+	if (direction == LEFT) {
+		for (int i = 7; i < bottom; ++i) {
+			if (mask->pixel(posBase.x + 6, posBase.y + i) == 255 || mask->pixel(posBase.x + 5, posBase.y + i) == 255) {
+				ret = true;
+			}
+			else if (!ignoreBlocker && mask->pixel(posBase.x + 3, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
+				ret = true;
+			}
+			else if (ignoreBlocker) {
+				ignoreBlocker = 0;
+			}
+		}
+	}
+	else if (direction == RIGHT) {
+		for (int i = 7; i < bottom; ++i) {
+			if (mask->pixel(posBase.x + 8, posBase.y + i) == 255 || mask->pixel(posBase.x + 9, posBase.y + i) == 255 || mask->pixel(posBase.x + 10, posBase.y + i) == 255) {
+				ret = true;
+			}
+			else if (!ignoreBlocker && mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 10, posBase.y + i) == blockerMask) {
+				ret = true;
+			}
+			else if (ignoreBlocker) {
+				ignoreBlocker = 0;
+			}
+		}
+	}
+
+	return ret;
+
+	/*posBase += glm::ivec2(7, 15);
+	if ((mask->pixel(posBase.x, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y) == 0) && (mask->pixel(posBase.x + 1, posBase.y - 1) == 0)) {
+	if (ignoreBlocker) ignoreBlocker = 0;
+	return false; // lemming can no longer fit though 1 pixel blocs, they now must have at least be 2 pixels with the mask set to 0 no not detect collision
+	}
+	else if (((mask->pixel(posBase.x, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y) == blockerMask) || (mask->pixel(posBase.x + 1, posBase.y - 1) == blockerMask)) && (ignoreBlocker))
+	return false;  // so there are no bugs when lemmings fall on blockers
+	return true;*/
+}
+
+bool Lemming::collisionStopper(Direction direction) {
+
+	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
+
+	bool ret = false;
+
+	if (direction == LEFT) {
+		for (int i = 7; i < 14; ++i) {
+			if (!ignoreBlocker && mask->pixel(posBase.x + 3, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
+				ret = true;
+			}
+			else if (ignoreBlocker) {
+				ignoreBlocker = 0;
+			}
+		}
+	}
+	else if (direction == RIGHT) {
+		for (int i = 7; i < 14; ++i) {
+			if (!ignoreBlocker && mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 10, posBase.y + i) == blockerMask) {
+				ret = true;
+			}
+			else if (ignoreBlocker) {
+				ignoreBlocker = 0;
+			}
+		}
+	}
+
+	return ret;
 }
 
 void Lemming::setPower(LemmingPower power) {
@@ -631,7 +741,7 @@ void Lemming::setPower(LemmingPower power) {
 		break;
 	}
 	case EXPLOADER: {
-		this->power = NONE;
+		this->power = EXPLOADER;
 		state = EXPLOAD_STATE;
 		break;
 	}

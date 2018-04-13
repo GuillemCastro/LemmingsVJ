@@ -29,6 +29,8 @@ public:
 	void mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton);
 	bool isALemmingAt(int x, int y);
 
+	void stop();
+
 private:
 	void initShaders();
 	void eraseMask(int mouseX, int mouseY);
@@ -56,6 +58,7 @@ private:
 	int numLemmingsAlive;
 	LemmingPower powerSelected;
 	int mouseX, mouseY;
+	int backgroundMusicID;
 	struct {
 		float top;
 		float bottom;

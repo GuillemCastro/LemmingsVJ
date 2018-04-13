@@ -59,6 +59,8 @@ public:
 
 	bool playSound(Sound sound, bool loop);
 
+	SoundManager& getSoundManager();
+
 private:
 
 	void initShaders();

@@ -39,6 +39,8 @@ public:
 private:
 	int collisionFloor(int maxFall);
 	bool collision(Direction direction);
+	bool collision(Direction direction, int bottom);
+	bool collisionStopper(Direction direction);
 	int collisionCeilling(int max);
 	
 	
@@ -61,7 +63,7 @@ private:
 	int builderCount;
 	bool initalized;
 	bool ignoreBlocker;
-	bool alive;
+	bool alive, playDie;
 
 };
 

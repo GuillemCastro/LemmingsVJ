@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
+#include "Game.h"
 
 
 Scene::Scene()
@@ -30,6 +31,8 @@ Scene::~Scene()
 void Scene::init()
 {
 	faster = false;
+
+	backgroundMusicID = Game::instance().playSound(LETSGO, false);
 
 	glm::vec2 geom[2] = {glm::vec2(0.f, 0.f), glm::vec2(512.f/*float(CAMERA_WIDTH)*/, 256.f/*float(CAMERA_HEIGHT)-30*/)};
 	glm::vec2 texCoords[2] = {glm::vec2(/*120.f / 512.0*/0.f, 0.f), glm::vec2(/*(120.f + 320.f) / 512.0f*/1.f, /*160.f / 256.0f*/1.f)};
@@ -77,10 +80,20 @@ void Scene::init()
 
 }
 
+void Scene::stop() {
+	Game::instance().getSoundManager().stop(MUSIC1, backgroundMusicID);
+}
+
 //unsigned int x = 0;
 
 void Scene::update(int deltaTime)
 {
+	if (Game::instance().getSoundManager().isPlaying(LETSGO, backgroundMusicID)) {
+		return;
+	}
+	else if (!Game::instance().getSoundManager().isPlaying(MUSIC1, backgroundMusicID)) {
+		backgroundMusicID = Game::instance().getSoundManager().play(MUSIC1, true);
+	}
 	if (faster)
 		deltaTime *= 2;
 	updateCamera();
@@ -177,7 +190,7 @@ void Scene::powerSelect(int powerNumber) {
 
 void Scene::updateCamera() {
 	if (mouseX >= CAMERA_WIDTH - 30) {
-		if (cameraPos.right < (SCENE1_WIDTH -1 )) {
+		if (cameraPos.right < (SCENE1_WIDTH -1)) {
 			cameraPos.left += 1;
 			cameraPos.right += 1;
 			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;

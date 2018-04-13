@@ -74,7 +74,7 @@ int Sprite::update(int deltaTime)
 	}
 
 	if (stop_render) {
-		pos = glm::vec2(392, 192);
+		pos = glm::vec2(1000, 1000);
 	}
 
 	return frames;

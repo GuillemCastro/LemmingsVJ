@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene2.h"
+#include "Game.h"
 
 
 Scene2::Scene2()
@@ -30,6 +31,8 @@ Scene2::~Scene2()
 void Scene2::init()
 {
 	faster = false;
+
+	backgroundMusicID = Game::instance().playSound(LETSGO, false);
 
 	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(848.f/*float(CAMERA_WIDTH)*/, 160.f/*float(CAMERA_HEIGHT)-30*/) };
 	glm::vec2 texCoords[2] = { glm::vec2(/*120.f / 512.0*/0.f, 0.f), glm::vec2(/*(120.f + 320.f) / 512.0f*/1.f, /*160.f / 256.0f*/1.f) };
@@ -77,8 +80,18 @@ void Scene2::init()
 
 }
 
+void Scene2::stop() {
+	Game::instance().getSoundManager().stop(MUSIC2, backgroundMusicID);
+}
+
 void Scene2::update(int deltaTime)
 {
+	if (Game::instance().getSoundManager().isPlaying(LETSGO, backgroundMusicID)) {
+		return;
+	}
+	else if (!Game::instance().getSoundManager().isPlaying(MUSIC2, backgroundMusicID)) {
+		backgroundMusicID = Game::instance().getSoundManager().play(MUSIC2, true);
+	}
 	if (faster)
 		deltaTime *= 2;
 	updateCamera();
@@ -180,15 +193,15 @@ void Scene2::updateCamera() {
 			cameraPos.left += 1;
 			cameraPos.right += 1;
 			edited = true;
-			cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
+			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
 		}
 	}
-	if (mouseX <= 30) {
+	else if (mouseX <= 30) {
 		if (cameraPos.left > 1) {
 			cameraPos.left -= 1;
 			cameraPos.right -= 1;
 			edited = true;
-			cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
+			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
 		}
 	}
 	if (mouseY >= CAMERA_HEIGHT - 60 && mouseY <= CAMERA_HEIGHT - 30) {
@@ -196,16 +209,19 @@ void Scene2::updateCamera() {
 			cameraPos.bottom += 1;
 			cameraPos.top += 1;
 			edited = true;
-			cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
+			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
 		}
 	}
-	if (mouseY <= 30) {
+	else if (mouseY <= 30) {
 		if (cameraPos.top > 1) {
 			cameraPos.bottom -= 1;
 			cameraPos.top -= 1;
 			edited = true;
-			cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
+			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
 		}
+	}
+	if (cameraPos.left >= cameraPos.right || cameraPos.top >= cameraPos.bottom) {
+		cout << "shet" << endl;
 	}
 	if (edited)
 		projection = glm::ortho(cameraPos.left, cameraPos.right, cameraPos.bottom, cameraPos.top);
