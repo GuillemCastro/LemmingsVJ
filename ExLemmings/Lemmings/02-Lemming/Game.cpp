@@ -12,7 +12,7 @@ void Game::init()
 	faster = false;
 	bLeftMouse = bRightMouse = false;
 
-	cout << "loading sounds " << sounds.init() << endl;
+	cout << "loading sounds " << SoundManager::instance().init() << endl;
 	//playSound(MUSIC1, true);
 
 	glClearColor(0.f, 0.f, 0.f, 1.f/*0.3f, 0.3f, 0.3f, 1.0f*/);
@@ -42,7 +42,7 @@ void Game::init()
 
 bool Game::update(int deltaTime)
 {
-	this->sounds.update();
+	SoundManager::instance().update();
 	if (!paused) {
 		switch (state) {
 			case MENU: {
@@ -340,11 +340,7 @@ int Game::timePerFrame() {
 }
 
 bool Game::playSound(Sound sound, bool loop) {
-	return sounds.play(sound, loop);
-}
-
-SoundManager& Game::getSoundManager() {
-	return sounds;
+	return SoundManager::instance().play(sound, loop);
 }
 
 

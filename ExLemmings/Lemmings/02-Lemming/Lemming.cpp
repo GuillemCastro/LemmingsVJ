@@ -199,7 +199,7 @@ void Lemming::update(int deltaTime)
 				state = CLIMBER_LEFT_STATE;
 			}
 			else if (power == CLIMBER) {
-				cout << "climber but ceilling" << endl;
+				//cout << "climber but ceilling" << endl;
 			}
 			else {
 				sprite->position() -= glm::vec2(-1, -1);
@@ -224,15 +224,15 @@ void Lemming::update(int deltaTime)
 		if(collision(RIGHT))
 		{
 			if (power == BASHER) {
-				cout << "collision right, changing to basher" << endl;
+				//cout << "collision right, changing to basher" << endl;
 				state = BASHER_RIGHT_STATE;
 			}
 			else if (power == CLIMBER && collisionCeilling(3) > 1) {
-				cout << "collisionCeilling " << collisionCeilling(3) << endl;
+				//cout << "collisionCeilling " << collisionCeilling(3) << endl;
 				state = CLIMBER_RIGHT_STATE;
 			}
 			else if (power == CLIMBER) {
-				cout << "climber but ceilling" << endl;
+				//cout << "climber but ceilling" << endl;
 			}
 			else {
 				sprite->position() -= glm::vec2(1, -1);
@@ -306,13 +306,13 @@ void Lemming::update(int deltaTime)
 		bool col = collision(RIGHT, 16);
 		bool stopper = collisionStopper(RIGHT);
 		if (fall > 1) {
-			cout << "fall, changing to falling" << endl;
+			//cout << "fall, changing to falling" << endl;
 			state = FALLING_RIGHT_STATE;
 			power = NONE;
 			sprite->changeAnimation(FALLING_RIGHT);
 		}
 		else if (!col || stopper) {
-			cout << "no col, changing to walker" << endl;
+			//cout << "no col, changing to walker" << endl;
 			state = WALKING_RIGHT_STATE;
 			power = NONE;
 			sprite->changeAnimation(WALKING_RIGHT);
@@ -355,10 +355,10 @@ void Lemming::update(int deltaTime)
 		fall = collisionFloor(2);
 		bool col = collision(LEFT);
 		sprite->position() += glm::vec2(0.f, -1.f);
-		cout << "climbing..." << endl;
+		//cout << "climbing..." << endl;
 		if (!col) {
 			sprite->position() += glm::vec2(0.f, 1.f);
-			cout << "CLIMBER LEFT no collision, changing to walking left" << endl;
+			//cout << "CLIMBER LEFT no collision, changing to walking left" << endl;
 			state = WALKING_LEFT_STATE;
 			sprite->changeAnimation(WALKING_LEFT);
 		}
@@ -368,23 +368,23 @@ void Lemming::update(int deltaTime)
 				if (col) {
 					state = FALLING_RIGHT_STATE;
 					sprite->changeAnimation(FALLING_RIGHT);
-					cout << "CLIMBER LEFT ceilling & fall, changing to falling right" << endl;
+					//cout << "CLIMBER LEFT ceilling & fall, changing to falling right" << endl;
 				}
 				else {
 					state = FALLING_LEFT_STATE;
 					sprite->changeAnimation(FALLING_LEFT);
-					cout << "CLIMBER LEFT ceilling & fall, changing to falling left" << endl;
+					//cout << "CLIMBER LEFT ceilling & fall, changing to falling left" << endl;
 				}
 			}
 			else {
 				if (col) {
-					cout << "CLIMBER LEFT ceilling but no fall, changing to walking right" << endl;
+					//cout << "CLIMBER LEFT ceilling but no fall, changing to walking right" << endl;
 					state = WALKING_RIGHT_STATE;
 					if (sprite->animation() != WALKING_RIGHT)
 						sprite->changeAnimation(WALKING_RIGHT);
 				}
 				else {
-					cout << "CLIMBER LEFT ceilling but no fall, changing to walking left" << endl;
+					//cout << "CLIMBER LEFT ceilling but no fall, changing to walking left" << endl;
 					state = WALKING_LEFT_STATE;
 					if (sprite->animation() != WALKING_LEFT)
 						sprite->changeAnimation(WALKING_LEFT);
@@ -398,34 +398,34 @@ void Lemming::update(int deltaTime)
 		fall = collisionFloor(2);
 		bool col = collision(RIGHT);
 		sprite->position() += glm::vec2(0.f, -1.f);
-		cout << "climbing..." << endl;
+		//cout << "climbing..." << endl;
 		if (!col) {
-			cout << "CLIMBER RIGHT no collision, changing to walking right" << endl;
+			//cout << "CLIMBER RIGHT no collision, changing to walking right" << endl;
 			state = WALKING_RIGHT_STATE;
 			sprite->changeAnimation(WALKING_RIGHT);
 		}
 		if (ceilling < 1) {
 			if (fall > 0) {
 				if (col) {
-					cout << "CLIMBER RIGHT ceilling & fall, changing to falling left" << endl;
+					//cout << "CLIMBER RIGHT ceilling & fall, changing to falling left" << endl;
 					state = FALLING_LEFT_STATE;
 					sprite->changeAnimation(FALLING_LEFT);
 				}
 				else {
-					cout << "CLIMBER RIGHT ceilling & fall, changing to falling right" << endl;
+					//cout << "CLIMBER RIGHT ceilling & fall, changing to falling right" << endl;
 					state = FALLING_RIGHT_STATE;
 					sprite->changeAnimation(FALLING_RIGHT);
 				}
 			}
 			else {
 				if (col) {
-					cout << "CLIMBER RIGHT ceilling but no fall, changing to walking left" << endl;
+					//cout << "CLIMBER RIGHT ceilling but no fall, changing to walking left" << endl;
 					state = WALKING_LEFT_STATE;
 					if (sprite->animation() != WALKING_LEFT)
 						sprite->changeAnimation(WALKING_LEFT);
 				}
 				else {
-					cout << "CLIMBER RIGHT ceilling but no fall, changing to walking right" << endl;
+					//cout << "CLIMBER RIGHT ceilling but no fall, changing to walking right" << endl;
 					state = WALKING_RIGHT_STATE;
 					if (sprite->animation() != WALKING_RIGHT)
 						sprite->changeAnimation(WALKING_RIGHT);
@@ -484,7 +484,7 @@ void Lemming::update(int deltaTime)
 	}
 	case DEAD_STATE:
 		if (alive && playDie && power != EXPLOADER) {
-			Game::instance().playSound(DIE, false);
+			SoundManager::instance().play(DIE, false);
 			playDie = false;
 		}
 		if (sprite->deathKeyframe()) {
@@ -496,7 +496,7 @@ void Lemming::update(int deltaTime)
 			sprite->changeAnimation(EXPLOSION);
 		}
 		if (sprite->explosionKeyframe()) {
-			Game::instance().playSound(EXPLODE, false);
+			SoundManager::instance().play(EXPLODE, false);
 			float r = 10.0f;
 			glm::vec2 pos = sprite->position();
 			pos.x += 8;

@@ -4,7 +4,6 @@
 
 SoundManager::SoundManager()
 {
-	uniqueID = 1;
 }
 
 
@@ -13,6 +12,9 @@ SoundManager::~SoundManager()
 }
 
 bool SoundManager::init() {
+
+	uniqueID = 1;
+
 	buffers[MUSIC1].loadFromFile("sounds/lemmings1.ogg");
 
 	buffers[EXPLODE].loadFromFile("sounds/EXPLODE.WAV");
@@ -64,7 +66,7 @@ bool SoundManager::pause(Sound sound, int id) {
 void SoundManager::update() {
 	for (int i = 0; i < NUM_SOUNDS; ++i) {
 		while (!sounds[i].empty() && sounds[i].front().sound.getStatus() == sf::SoundSource::Status::Stopped) {
-			sounds[i].pop_front();
+ 			sounds[i].pop_front();
 		}
 	}
 }

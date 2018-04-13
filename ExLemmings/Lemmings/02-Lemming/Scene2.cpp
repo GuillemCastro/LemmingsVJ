@@ -32,8 +32,8 @@ void Scene2::init()
 {
 	faster = false;
 
-	backgroundMusicID = Game::instance().playSound(LETSGO, false);
-
+	backgroundMusicID = SoundManager::instance().play(LETSGO, false);
+	backgroundMusicPlaying = false;
 	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(848.f/*float(CAMERA_WIDTH)*/, 160.f/*float(CAMERA_HEIGHT)-30*/) };
 	glm::vec2 texCoords[2] = { glm::vec2(/*120.f / 512.0*/0.f, 0.f), glm::vec2(/*(120.f + 320.f) / 512.0f*/1.f, /*160.f / 256.0f*/1.f) };
 	glm::vec2 geomButton[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), 30.f) };
@@ -65,9 +65,9 @@ void Scene2::init()
 	buttonsTexture.setMinFilter(GL_NEAREST);
 	buttonsTexture.setMagFilter(GL_NEAREST);
 
-	cameraPos = { 0.0f, float(CAMERA_HEIGHT - 1), 0.0f, float(CAMERA_WIDTH - 1) };
+	cameraPos = { 0, CAMERA_HEIGHT, 0, CAMERA_WIDTH };
 
-	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
+	projection = glm::ortho(0.f, CAMERA_WIDTH*1.f, CAMERA_HEIGHT*1.f, 0.f);
 	currentTime = 0.0f;
 
 	for (int i = 0; i < 10; ++i) {
@@ -81,16 +81,17 @@ void Scene2::init()
 }
 
 void Scene2::stop() {
-	Game::instance().getSoundManager().stop(MUSIC2, backgroundMusicID);
+	SoundManager::instance().stop(MUSIC2, backgroundMusicID);
 }
 
 void Scene2::update(int deltaTime)
 {
-	if (Game::instance().getSoundManager().isPlaying(LETSGO, backgroundMusicID)) {
+	if (!backgroundMusicPlaying && SoundManager::instance().isPlaying(LETSGO, backgroundMusicID)) {
 		return;
 	}
-	else if (!Game::instance().getSoundManager().isPlaying(MUSIC2, backgroundMusicID)) {
-		backgroundMusicID = Game::instance().getSoundManager().play(MUSIC2, true);
+	else if (!backgroundMusicPlaying && !SoundManager::instance().isPlaying(MUSIC2, backgroundMusicID) ) {
+		backgroundMusicID = SoundManager::instance().play(MUSIC2, true);
+		backgroundMusicPlaying = true;
 	}
 	if (faster)
 		deltaTime *= 2;
@@ -188,43 +189,71 @@ void Scene2::powerSelect(int powerNumber) {
 
 void Scene2::updateCamera() {
 	bool edited = false;
-	if (mouseX >= CAMERA_WIDTH - 30) {
-		if (cameraPos.right < (SCENE2_WIDTH - 1)) {
-			cameraPos.left += 1;
-			cameraPos.right += 1;
+	if (cameraPos.bottom - cameraPos.top != CAMERA_HEIGHT) {
+		cameraPos.top = 0;
+		cameraPos.bottom = CAMERA_HEIGHT;
+	}
+	if (cameraPos.left - cameraPos.right != CAMERA_WIDTH) {
+		if (cameraPos.left >= 0 && cameraPos.left <= SCENE2_WIDTH - CAMERA_WIDTH) {
+			cameraPos.right = cameraPos.left + CAMERA_WIDTH;
+		}
+		else if (cameraPos.left >= CAMERA_WIDTH && cameraPos.left <= SCENE2_WIDTH) {
+			cameraPos.left = cameraPos.right - CAMERA_WIDTH;
+		}
+		else {
+			cameraPos.left = 0;
+			cameraPos.right = CAMERA_WIDTH;
+		}
+	}
+	CameraPos newPos = cameraPos;
+	if (mouseX >= CAMERA_WIDTH - 30 && mouseX <= CAMERA_WIDTH && mouseY <= CAMERA_HEIGHT -30) {
+		if (cameraPos.right < (SCENE2_WIDTH) && cameraPos.left < cameraPos.right) {
+			newPos.left = cameraPos.left + 1;
+			newPos.right = cameraPos.right + 1;
 			edited = true;
 			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
 		}
 	}
-	else if (mouseX <= 30) {
-		if (cameraPos.left > 1) {
-			cameraPos.left -= 1;
-			cameraPos.right -= 1;
+	if (mouseX <= 30 && mouseX >= 0 && mouseY <= CAMERA_HEIGHT-30) {
+		if (cameraPos.left > 0 && cameraPos.left < cameraPos.right) {
+			newPos.left = cameraPos.left - 1;
+			newPos.right = cameraPos.right - 1;
 			edited = true;
 			//cout << "updating camera left right " << cameraPos.left << " " << cameraPos.right << endl;
 		}
 	}
 	if (mouseY >= CAMERA_HEIGHT - 60 && mouseY <= CAMERA_HEIGHT - 30) {
-		if (cameraPos.bottom < SCENE2_HEIGHT - 1) {
-			cameraPos.bottom += 1;
-			cameraPos.top += 1;
+		if (cameraPos.bottom < SCENE2_HEIGHT && cameraPos.top < cameraPos.bottom) {
+			newPos.bottom = cameraPos.bottom + 1;
+			newPos.top = cameraPos.top + 1;
 			edited = true;
 			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
 		}
 	}
-	else if (mouseY <= 30) {
-		if (cameraPos.top > 1) {
-			cameraPos.bottom -= 1;
-			cameraPos.top -= 1;
+	if (mouseY <= 30 && mouseY >= 0) {
+		if (cameraPos.top >= 1 && cameraPos.top < cameraPos.bottom) {
+			newPos.bottom = cameraPos.bottom - 1;
+			newPos.top = cameraPos.top - 1;
 			edited = true;
 			//cout << "updating camera top bottom " << cameraPos.top << " " << cameraPos.bottom << endl;
 		}
 	}
 	if (cameraPos.left >= cameraPos.right || cameraPos.top >= cameraPos.bottom) {
-		cout << "shet" << endl;
+		cameraPos = {
+			0, CAMERA_HEIGHT, 0, CAMERA_WIDTH
+		};
+
 	}
-	if (edited)
-		projection = glm::ortho(cameraPos.left, cameraPos.right, cameraPos.bottom, cameraPos.top);
+	if (edited && newPos.top < newPos.bottom && newPos.left < newPos.right
+		&& newPos.bottom - newPos.top == CAMERA_HEIGHT && newPos.right - newPos.left == CAMERA_WIDTH) {
+		cameraPos = newPos;
+		cout << "update camera top: " << cameraPos.top << " bottom: " << cameraPos.bottom << " left: " << cameraPos.left << " right: " << cameraPos.right << endl;
+		projection = glm::ortho(float(cameraPos.left), float(cameraPos.right), float(cameraPos.bottom), float(cameraPos.top));
+	}
+	else if (edited) {
+		cout << "failt to update camera top: " << newPos.top << " bottom: " << newPos.bottom << " left: " << newPos.left << " right: " << newPos.right << endl;
+		projection = glm::ortho(float(cameraPos.left), float(cameraPos.right), float(cameraPos.bottom), float(cameraPos.top));
+	}
 }
 
 void Scene2::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton)

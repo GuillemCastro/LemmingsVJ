@@ -24,6 +24,11 @@ public:
 	SoundManager();
 	~SoundManager();
 
+	static SoundManager& instance() {
+		static SoundManager sm;
+		return sm;
+	}
+
 	bool init();
 
 	void update();

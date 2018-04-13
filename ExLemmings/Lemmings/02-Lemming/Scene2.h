@@ -14,7 +14,6 @@
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
-
 class Scene2
 {
 
@@ -59,13 +58,9 @@ private:
 	LemmingPower powerSelected;
 	int mouseX, mouseY;
 	int backgroundMusicID;
-	struct {
-		float top;
-		float bottom;
-		float left;
-		float right;
-	} cameraPos;
+	CameraPos cameraPos;
 	bool faster;
+	bool backgroundMusicPlaying;
 };
 
 

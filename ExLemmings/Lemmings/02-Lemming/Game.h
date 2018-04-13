@@ -22,9 +22,6 @@ class Game
 
 public:
 	Game() {
-		this->scene1 = NULL;
-		this->scene2 = NULL;
-		this->menuScene = NULL;
 	}
 	
 	
@@ -59,8 +56,6 @@ public:
 
 	bool playSound(Sound sound, bool loop);
 
-	SoundManager& getSoundManager();
-
 private:
 
 	void initShaders();
@@ -80,7 +75,6 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram;
 	glm::mat4 projection;
 	GameScene state;
-	SoundManager sounds;
 
 	Texture cursorNormal;
 	Texture cursorSelected;
