@@ -167,5 +167,8 @@ glm::vec2 &Sprite::position()
 }
 
 
+int Sprite::getCurrentKeyframe() {
+	return currentKeyframe;
+}
 
 

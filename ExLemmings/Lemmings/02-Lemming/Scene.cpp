@@ -70,6 +70,9 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH), float(CAMERA_HEIGHT), 0.f);
 	currentTime = 0.0f;
+
+	entryDoor.init(glm::vec2(120 + 60, 10 + 30), doorTexProgram, true);
+	exitDoor.init(glm::vec2(348, 107), doorTexProgram, false);
 	
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(120 + 60 + 10, 10 + 30), simpleTexProgram);
@@ -103,6 +106,10 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	int init = currentTime / 2000;
 	lemmingInit[init] = true;
+
+	entryDoor.update(deltaTime);
+	exitDoor.update(deltaTime);
+
 	for (int i = 0; i < 10; ++i) {
 		if (lemmings[i].isAlive()) {
 			numLemmingsAlive++;
@@ -130,7 +137,16 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
 	bridges->render(maskedTexProgram, bridgeColorTexture, bridgesTextureMask);
-	
+
+
+	doorTexProgram.use();
+	doorTexProgram.setUniformMatrix4f("projection", projection);
+	doorTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	doorTexProgram.setUniformMatrix4f("modelview", modelview);
+	entryDoor.render();
+	exitDoor.render();
+
 	for (int i = 0; i < 10; ++i) {
 		if (lemmingInit[i]) {
 			simpleTexProgram.use();
@@ -370,6 +386,11 @@ void Scene::initShaders()
 	simpleTexProgram.addShader(vShader);
 	simpleTexProgram.addShader(fShader);
 	simpleTexProgram.link();
+
+	doorTexProgram.init();
+	doorTexProgram.addShader(vShader);
+	doorTexProgram.addShader(fShader);
+	doorTexProgram.link();
 
 	buttonsTexProgram.init();
 	buttonsTexProgram.addShader(vShader);

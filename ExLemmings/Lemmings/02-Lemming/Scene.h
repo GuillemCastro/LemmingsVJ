@@ -6,6 +6,7 @@
 #include "ShaderProgram.h"
 #include "MaskedTexturedQuad.h"
 #include "Lemming.h"
+#include "Door.h"
 #include "TexturedQuad.h"
 
 #define SCENE1_WIDTH 520
@@ -48,9 +49,11 @@ private:
 	Texture bridgeColorTexture;
 	VariableTexture bridgesTextureMask;
 	MaskedTexturedQuad* bridges;
-	ShaderProgram simpleTexProgram, maskedTexProgram, buttonsTexProgram;
+	ShaderProgram simpleTexProgram, maskedTexProgram, buttonsTexProgram, doorTexProgram;
 	float currentTime;
 	glm::mat4 projection;
+	Door entryDoor;
+	Door exitDoor;
 	//Lemming lemming;
 	Lemming lemmings[10];
 	bool lemmingInit[10];
