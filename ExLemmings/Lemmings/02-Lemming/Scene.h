@@ -64,6 +64,8 @@ private:
 	bool faster;
 	int backgroundMusicID;
 	bool backgroundMusicPlaying;
+	Texture entryDoorsheet;
+
 };
 
 

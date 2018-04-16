@@ -65,6 +65,9 @@ void Scene2::init()
 	buttonsTexture.setMinFilter(GL_NEAREST);
 	buttonsTexture.setMagFilter(GL_NEAREST);
 
+	entryDoor.init(glm::vec2(120 + 60, 10 + 30), simpleTexProgram, true);
+	exitDoor.init(glm::vec2(733, 107), simpleTexProgram, false);
+
 	cameraPos = { 0, CAMERA_HEIGHT, 0, CAMERA_WIDTH };
 
 	projection = glm::ortho(0.f, CAMERA_WIDTH*1.f, CAMERA_HEIGHT*1.f, 0.f);
@@ -99,6 +102,10 @@ void Scene2::update(int deltaTime)
 	numLemmingsAlive = 0;
 	currentTime += deltaTime;
 	int init = currentTime / 2000;
+
+	entryDoor.update(deltaTime);
+	exitDoor.update(deltaTime);
+
 	lemmingInit[init] = true;
 	for (int i = 0; i < 10; ++i) {
 		if (lemmings[i].isAlive()) {
@@ -127,6 +134,14 @@ void Scene2::render()
 	modelview = glm::mat4(1.0f);
 	maskedTexProgram.setUniformMatrix4f("modelview", modelview);
 	bridges->render(maskedTexProgram, bridgeColorTexture, bridgesTextureMask);
+
+	simpleTexProgram.use();
+	simpleTexProgram.setUniformMatrix4f("projection", projection);
+	simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+	entryDoor.render();
+	exitDoor.render();
 
 	for (int i = 0; i < 10; ++i) {
 		if (lemmingInit[i]) {

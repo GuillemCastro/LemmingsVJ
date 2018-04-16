@@ -68,6 +68,7 @@ void Scene::init()
 
 	cameraPos = {0, CAMERA_HEIGHT, 0, CAMERA_WIDTH};
 
+
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH), float(CAMERA_HEIGHT), 0.f);
 	currentTime = 0.0f;
 

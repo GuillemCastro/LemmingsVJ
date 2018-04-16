@@ -7,6 +7,7 @@
 #include "MaskedTexturedQuad.h"
 #include "Lemming.h"
 #include "TexturedQuad.h"
+#include "Door.h"
 
 #define SCENE2_WIDTH 848
 #define SCENE2_HEIGHT 160
@@ -51,6 +52,8 @@ private:
 	ShaderProgram simpleTexProgram, maskedTexProgram, buttonsTexProgram;
 	float currentTime;
 	glm::mat4 projection;
+	Door entryDoor;
+	Door exitDoor;
 	//Lemming lemming;
 	Lemming lemmings[10];
 	bool lemmingInit[10];
