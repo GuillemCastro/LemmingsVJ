@@ -35,6 +35,7 @@ public:
 	void setPower(LemmingPower power);
 	bool insideCollisionBox(int x, int y);
 	bool isAlive();
+	LemmingPower getPower();
 	
 private:
 	int collisionFloor(int maxFall);

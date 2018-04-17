@@ -781,3 +781,7 @@ bool Lemming::isAlive() {
 	return true;
 }
 
+LemmingPower Lemming::getPower() {
+	return this->power;
+}
+
