@@ -57,3 +57,6 @@ void Door::update(int deltaTime)
 		return;
 }
 
+glm::vec2 Door::position() const {
+	return sprite->position();
+}

@@ -41,6 +41,7 @@ private:
 	void powerSelect(int powerNumber);
 	void updateCamera();
 	void checkLemmingSelected();
+	bool lemmingAtExit();
 
 private:
 	Texture colorTexture;
@@ -61,7 +62,7 @@ private:
 	//Lemming lemming;
 	Lemming lemmings[10];
 	bool lemmingInit[10];
-	int numLemmingsAlive;
+	int numLemmingsAlive, numLemmingsInit;
 	LemmingPower powerSelected;
 	int mouseX, mouseY;
 	int backgroundMusicID;
@@ -71,6 +72,9 @@ private:
 	bool lemmingSelected;
 	std::string powerLemmingSelected;
 	Text uiText;
+
+	bool win, lose;
+	bool surrender;
 };
 
 

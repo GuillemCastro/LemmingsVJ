@@ -19,6 +19,7 @@ public:
 	void init(const glm::vec2 &initialPosition, ShaderProgram &shaderProgram, bool entryDoor);
 	void update(int deltaTime);
 	void render();
+	glm::vec2 position() const;
 
 private:
 	Texture spritesheet;

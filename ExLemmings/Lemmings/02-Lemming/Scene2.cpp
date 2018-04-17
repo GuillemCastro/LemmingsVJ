@@ -31,6 +31,12 @@ Scene2::~Scene2()
 void Scene2::init()
 {
 	faster = false;
+	win = false;
+	lose = false;
+	surrender = false;
+
+	numLemmingsAlive = 10;
+	numLemmingsInit = 0;
 
 	backgroundMusicID = SoundManager::instance().play(LETSGO, false);
 	backgroundMusicPlaying = false;
@@ -102,24 +108,48 @@ void Scene2::update(int deltaTime)
 	if (faster)
 		deltaTime *= 2;
 	updateCamera();
-	numLemmingsAlive = 0;
-	currentTime += deltaTime;
-	int init = currentTime / 2000;
+	
+	if (!win && !lose) {
+		currentTime += deltaTime;
+		int init = currentTime / 2000;
 
-	entryDoor.update(deltaTime);
-	exitDoor.update(deltaTime);
+		entryDoor.update(deltaTime);
+		exitDoor.update(deltaTime);
 
-	lemmingInit[init] = true;
-	for (int i = 0; i < 10; ++i) {
-		if (lemmings[i].isAlive()) {
-			numLemmingsAlive++;
+		if (!surrender)
+			lemmingInit[init] = true;
+		numLemmingsAlive = 0;
+		numLemmingsInit = 0;
+		for (int i = 0; i < 10; ++i) {
+			if (lemmingInit[i]) {
+				lemmings[i].update(deltaTime);
+				++numLemmingsInit;
+			}
+			if (lemmings[i].isAlive()) {
+				numLemmingsAlive++;
+				if (surrender && lemmings[i].getPower() != EXPLOADER) {
+					lemmings[i].setPower(EXPLOADER);
+				}
+			}
+
 		}
-		if (lemmingInit[i]) {
-			lemmings[i].update(deltaTime);
+		if (surrender && (10 - numLemmingsAlive) == numLemmingsInit) {
+			lose = true;
 		}
 	}
 
+	if (numLemmingsAlive > 10)
+		numLemmingsAlive = 10;
+	else if (numLemmingsAlive < 0)
+		numLemmingsAlive = 0;
+	if (numLemmingsInit > 10)
+		numLemmingsInit = 10;
+	else if (numLemmingsInit < 0)
+		numLemmingsInit = 0;
+
 	checkLemmingSelected();
+	lose = lose || lemmingAtExit() || ((SCENE2_MAX_TIME - (currentTime / 1000)) <= 0);
+	win = win || (numLemmingsAlive == 0);
 }
 
 void Scene2::render()
@@ -177,6 +207,19 @@ void Scene2::render()
 	char buff[100];
 	sprintf(buff, "%d:%d%d", secondsLeft / 60, (secondsLeft % 60) / 10, (secondsLeft % 60) % 10);
 	uiText.render(buff, glm::vec2(VIEWPORT_WIDTH - 100, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
+
+	sprintf(buff, "In: %d", numLemmingsInit);
+	uiText.render(buff, glm::vec2(250, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
+
+	sprintf(buff, "Dead: %d%%", (10 - numLemmingsAlive) * 10);
+	uiText.render(buff, glm::vec2(400, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
+
+	if (win) {
+		//render win screen
+	}
+	if (lose) {
+		//render lose screen
+	}
 
 }
 
@@ -298,15 +341,17 @@ void Scene2::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightBut
 	if (bLeftButton) {
 		//cout << "clicked at " << mouseX / 3 << " " << mouseY / 3 << endl;
 
-		if (this->mouseX >= 292 && this->mouseX <= 320 && this->mouseY >= 160 && this->mouseY <= 190) {
+		if (this->mouseX >= 292 && this->mouseX <= 320 && this->mouseY >= CAMERA_HEIGHT - 30 && this->mouseY <= CAMERA_HEIGHT) {
 			for (int i = 0; i < 10; ++i) {
 				if (lemmingInit[i]) {
 					lemmings[i].setPower(EXPLOADER);
 				}
 			}
+			surrender = true;
 		}
 
-		if (this->mouseX >= 266 && this->mouseX <= 292 && this->mouseY >= 160 && this->mouseY <= 190) {
+		if (this->mouseX >= 266 && this->mouseX <= 292 && this->mouseY >= CAMERA_HEIGHT - 30 && this->mouseY <= CAMERA_HEIGHT) {
+			cout << "faster" << endl;
 			this->faster = !faster;
 		}
 
@@ -465,6 +510,16 @@ void Scene2::checkLemmingSelected() {
 	else {
 		this->lemmingSelected = false;
 	}
+}
+
+bool Scene2::lemmingAtExit() {
+	bool lemmingAtExit = false;
+	for (int i = 0; i < 10; ++i) {
+		if (lemmings[i].insideCollisionBox(exitDoor.position().x + 25, exitDoor.position().y + 15) && lemmingInit[i]) {
+			lemmingAtExit = true;
+		}
+	}
+	return lemmingAtExit;
 }
 
 

@@ -776,7 +776,7 @@ void Lemming::setBridges(VariableTexture* bridges) {
 
 bool Lemming::isAlive() {
 	if (initalized && !alive) {
-		return 0;
+		return false;
 	}
 	return true;
 }
