@@ -65,6 +65,9 @@ void Scene2::init()
 	buttonsTexture.setMinFilter(GL_NEAREST);
 	buttonsTexture.setMagFilter(GL_NEAREST);
 
+	if (!uiText.init("fonts/OpenSans-Regular.ttf"))
+		std::cout << "Could not load font!!!" << endl;
+
 	entryDoor.init(glm::vec2(120 + 60, 10 + 30), simpleTexProgram, true);
 	exitDoor.init(glm::vec2(733, 107), simpleTexProgram, false);
 
@@ -115,6 +118,8 @@ void Scene2::update(int deltaTime)
 			lemmings[i].update(deltaTime);
 		}
 	}
+
+	checkLemmingSelected();
 }
 
 void Scene2::render()
@@ -161,6 +166,17 @@ void Scene2::render()
 	modelview = glm::translate(modelview, glm::vec3(0.f + cameraPos.left, float(CAMERA_HEIGHT) - 30.f + cameraPos.top, 0.f));
 	buttonsTexProgram.setUniformMatrix4f("modelview", modelview);
 	buttonQuad->render(buttonsTexture);
+
+	if (lemmingSelected) {
+		uiText.render(this->powerLemmingSelected, glm::vec2(10, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	}
+
+	int secondsLeft = SCENE2_MAX_TIME - (currentTime / 1000);
+	if (secondsLeft < 0)
+		secondsLeft = 0;
+	char buff[100];
+	sprintf(buff, "%d:%d%d", secondsLeft / 60, (secondsLeft % 60) / 10, (secondsLeft % 60) % 10);
+	uiText.render(buff, glm::vec2(VIEWPORT_WIDTH - 100, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 }
 
@@ -432,4 +448,23 @@ bool Scene2::isALemmingAt(int x, int y) {
 	}
 	return lemmingThere;
 }
+
+void Scene2::checkLemmingSelected() {
+	Lemming* selectedLemming;
+	bool selected = false;
+	for (int i = 0; i < 10; ++i) {
+		if (lemmings[i].insideCollisionBox(mouseX + cameraPos.left, mouseY + cameraPos.top) && lemmingInit[i]) {
+			selected = true;
+			selectedLemming = &lemmings[i];
+		}
+	}
+	if (selected) {
+		this->powerLemmingSelected = powerToString(selectedLemming->getPower());
+		this->lemmingSelected = true;
+	}
+	else {
+		this->lemmingSelected = false;
+	}
+}
+
 

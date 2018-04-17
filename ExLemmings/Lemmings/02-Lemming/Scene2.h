@@ -8,9 +8,12 @@
 #include "Lemming.h"
 #include "TexturedQuad.h"
 #include "Door.h"
+#include "common_utils.h"
+#include "Text.h"
 
 #define SCENE2_WIDTH 848
 #define SCENE2_HEIGHT 160
+#define SCENE2_MAX_TIME 180
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -37,6 +40,7 @@ private:
 	void applyMask(int mouseX, int mouseY);
 	void powerSelect(int powerNumber);
 	void updateCamera();
+	void checkLemmingSelected();
 
 private:
 	Texture colorTexture;
@@ -64,6 +68,9 @@ private:
 	CameraPos cameraPos;
 	bool faster;
 	bool backgroundMusicPlaying;
+	bool lemmingSelected;
+	std::string powerLemmingSelected;
+	Text uiText;
 };
 
 
