@@ -11,6 +11,7 @@
 #include <string>
 #include "common_utils.h"
 #include "Text.h"
+#include <map>
 
 #define SCENE1_WIDTH 520
 #define SCENE1_HEIGHT 160
@@ -77,6 +78,8 @@ private:
 
 	Texture plainTexture;
 	TexturedQuad* endScreen;
+
+	std::map<int, int> powerNumbers;
 
 	bool win, lose;
 	bool surrender;

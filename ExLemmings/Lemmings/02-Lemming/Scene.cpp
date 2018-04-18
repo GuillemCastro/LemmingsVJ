@@ -99,6 +99,14 @@ void Scene::init()
 	}
 	lemmingInit[0] = 1;
 
+	powerNumbers[CLIMBER] = 0;
+	powerNumbers[UMBRELLA] = 0;
+	powerNumbers[EXPLOADER] = 1;
+	powerNumbers[BLOCKER] = 0;
+	powerNumbers[BUILDER] = 0;
+	powerNumbers[BASHER] = 0;
+	powerNumbers[MINER] = 0;
+	powerNumbers[DIGGER] = 1;
 }
 
 void Scene::stop() {
@@ -225,6 +233,16 @@ void Scene::render()
 
 	sprintf(buff, "Dead: %d%%", (10-numLemmingsAlive)*10);
 	uiText.render(buff, glm::vec2(400, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
+
+	char buff2[50];
+	int st = 185;
+	int dist = 80;
+
+	for (std::map<int, int>::iterator it = powerNumbers.begin(); it != powerNumbers.end(); ++it) {
+		sprintf(buff2, "%d", it->second);
+		uiText.render(buff2, glm::vec2(st, VIEWPORT_HEIGHT - 55), 40, glm::vec4(0.f, 0.f, 0.f, 1.f));
+		st += dist;
+	}
 
 	if (win || lose) {
 		simpleTexProgram.use();
@@ -401,7 +419,10 @@ void Scene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButt
 			}
 		}
 		if (selected) {
-			selectedLemming->setPower(powerSelected);
+			if (!(selectedLemming->getPower() == powerSelected) & powerNumbers[powerSelected] > 0) { //to not assign a power a lemming already has
+				selectedLemming->setPower(powerSelected);
+				powerNumbers[powerSelected] -= 1;
+			}
 		}
 	}
 

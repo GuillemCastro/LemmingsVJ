@@ -10,6 +10,7 @@
 #include "Door.h"
 #include "common_utils.h"
 #include "Text.h"
+#include <map>
 
 #define SCENE2_WIDTH 848
 #define SCENE2_HEIGHT 160
@@ -72,6 +73,8 @@ private:
 	bool lemmingSelected;
 	std::string powerLemmingSelected;
 	Text uiText;
+
+	std::map<int, int> powerNumbers;
 
 	bool win, lose;
 	bool surrender;
