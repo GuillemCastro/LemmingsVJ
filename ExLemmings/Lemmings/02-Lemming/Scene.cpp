@@ -82,7 +82,7 @@ void Scene::init()
 	currentTime = 0.0f;
 
 	entryDoor.init(glm::vec2(120 + 60, 10 + 30), doorTexProgram, true);
-	exitDoor.init(glm::vec2(348, 107), doorTexProgram, false);
+	exitDoor.init(glm::vec2(285, 56), doorTexProgram, false);
 	
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(120 + 60 + 10, 10 + 30), simpleTexProgram);
