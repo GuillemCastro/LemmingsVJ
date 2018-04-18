@@ -240,7 +240,7 @@ void Scene2::render()
 		sprintf(buff2, "You needed: %d%%", 100);
 		uiText.render(buff2, glm::vec2(250.f, 350.f), 50, glm::vec4(0.f, 1.f, 0.f, 1.f));
 		if (win) {
-			uiText.render("YOU WIN!", glm::vec2(300.f, 500.f), 50, glm::vec4(0.f, 1.f, 0.4f, 1.f));
+			uiText.render("YOU WIN!", glm::vec2(320.f, 500.f), 50, glm::vec4(0.f, 1.f, 0.4f, 1.f));
 		}
 		if (lose) {
 			uiText.render("YOU LOSE!", glm::vec2(300.f, 500.f), 60, glm::vec4(1.f, 0.f, 0.2f, 1.f));
