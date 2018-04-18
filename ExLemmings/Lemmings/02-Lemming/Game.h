@@ -14,7 +14,7 @@
 // Game is a singleton (a class with a single instance) that represents our whole application
 
 enum GameScene {
-	MENU, SCENE1, SCENE2, SCENE3
+	MENU, SCENE1, SCENE2, SCENE3, CREDITS
 };
 
 class Game

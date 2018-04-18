@@ -75,6 +75,9 @@ private:
 	std::string powerLemmingSelected;
 	Text uiText;
 
+	Texture plainTexture;
+	TexturedQuad* endScreen;
+
 	bool win, lose;
 	bool surrender;
 };

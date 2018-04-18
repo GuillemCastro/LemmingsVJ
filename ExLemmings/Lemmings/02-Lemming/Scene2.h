@@ -75,6 +75,9 @@ private:
 
 	bool win, lose;
 	bool surrender;
+
+	Texture plainTexture;
+	TexturedQuad* endScreen;
 };
 
 

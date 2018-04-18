@@ -17,7 +17,7 @@ MenuScene::~MenuScene()
 }
 
 void MenuScene::init() {
-	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT) - 30) };
+	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), float(CAMERA_HEIGHT) - 60) };
 	glm::vec2 geomButtons[2] = {glm::vec2(0.f, 0.f), glm::vec2(50.0f, 25.0f)};
 	glm::vec2 texCoords[2] = { glm::vec2(0.0f, 0.f), glm::vec2(1.0f, 1.0f) };
 

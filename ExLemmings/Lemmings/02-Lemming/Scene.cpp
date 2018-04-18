@@ -72,6 +72,13 @@ void Scene::init()
 	buttonsTexture.setMinFilter(GL_NEAREST);
 	buttonsTexture.setMagFilter(GL_NEAREST);
 
+	glm::vec2 endScreenGeom[2] = {glm::vec2(0.f, 0.f), glm::vec2(CAMERA_WIDTH, CAMERA_HEIGHT)};
+	glm::vec2 endScreenTexGeom[2] = {glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f)};
+	endScreen = TexturedQuad::createTexturedQuad(endScreenGeom, endScreenTexGeom, simpleTexProgram);
+	plainTexture.createEmptyTexture(CAMERA_WIDTH, CAMERA_HEIGHT);
+	plainTexture.setMinFilter(GL_NEAREST);
+	plainTexture.setMagFilter(GL_NEAREST);
+
 	if (!uiText.init("fonts/OpenSans-Regular.ttf"))
 		std::cout << "Could not load font!!!" << endl;
 
@@ -82,7 +89,7 @@ void Scene::init()
 	currentTime = 0.0f;
 
 	entryDoor.init(glm::vec2(120 + 60, 10 + 30), doorTexProgram, true);
-	exitDoor.init(glm::vec2(348, 107), doorTexProgram, false);
+	exitDoor.init(glm::vec2(280, 55), doorTexProgram, false);
 	
 	for (int i = 0; i < 10; ++i) {
 		lemmings[i].init(glm::vec2(120 + 60 + 10, 10 + 30), simpleTexProgram);
@@ -153,7 +160,7 @@ void Scene::update(int deltaTime)
 
 	checkLemmingSelected();
 	lose = lose || lemmingAtExit() || ((SCENE1_MAX_TIME - (currentTime / 1000)) <= 0);
-	win = win || (numLemmingsAlive == 0);
+	win = (win || (numLemmingsAlive == 0)) && !lose && !surrender;
 }
 
 void Scene::render()
@@ -219,13 +226,31 @@ void Scene::render()
 	sprintf(buff, "Dead: %d%%", (10-numLemmingsAlive)*10);
 	uiText.render(buff, glm::vec2(400, VIEWPORT_HEIGHT - 110), 40, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
-	if (win) {
-		//render win screen
+	if (win || lose) {
+		simpleTexProgram.use();
+		simpleTexProgram.setUniformMatrix4f("projection", projection);
+		simpleTexProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+		modelview = glm::mat4(1.0f);
+		modelview = glm::translate(modelview, glm::vec3(cameraPos.left, cameraPos.top, 0.f));
+		simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+
+		endScreen->render(plainTexture);
+
+		uiText.render("All lemmings accounted for.", glm::vec2(160.f, 140.f), 50, glm::vec4(0.f, 1.f, 0.f, 1.f));
+
+		char buff2[100];
+		sprintf(buff2, "You killed: %d%%", (10 - numLemmingsAlive) * 10);
+		uiText.render(buff2, glm::vec2(300.f, 300.f), 50, glm::vec4(0.f, 1.f, 0.f, 1.f));
+
+		sprintf(buff2, "You needed: %d%%", 100);
+		uiText.render(buff2, glm::vec2(250.f, 350.f), 50, glm::vec4(0.f, 1.f, 0.f, 1.f));
+		if (win) {
+			uiText.render("YOU WIN!", glm::vec2(300.f, 500.f), 50, glm::vec4(0.f, 1.f, 0.4f, 1.f));
+		}
+		if (lose) {
+			uiText.render("YOU LOSE!", glm::vec2(300.f, 500.f), 60, glm::vec4(1.f, 0.f, 0.2f, 1.f));
+		}
 	}
-	if (lose) {
-		//render lose screen
-	}
-	
 }
 
 void Scene::powerSelect(int powerNumber) {

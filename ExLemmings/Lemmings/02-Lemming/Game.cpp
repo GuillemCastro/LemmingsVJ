@@ -75,6 +75,13 @@ bool Game::update(int deltaTime)
 				lemmingSelected = scene2->isALemmingAt(mouseX / ratio, mouseY / ratio);
 				break;
 			}
+			case CREDITS: {
+				if (menuScene != NULL) {
+					delete menuScene;
+					menuScene = NULL;
+				}
+				break;
+			}
 		}
 	}	
 	return bPlay;
@@ -94,6 +101,10 @@ void Game::render()
 		}
 		case SCENE2: {
 			scene2->render();
+			break;
+		}
+		case CREDITS: {
+			break;
 		}
 	}
 	if (paused) {
@@ -108,7 +119,7 @@ void Game::render()
 		simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 
 		pausedQuad->render(plainTexture);
-		pausedText.render("PAUSED", glm::vec2(320, 240), 72, glm::vec4(1, 0.2f, 0.2f, 1));
+		pausedText.render("MENU", glm::vec2(350, 240), 72, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"P\" to resume", glm::vec2(360, 275), 20, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"M\" to return to the menu", glm::vec2(310, 300), 20, glm::vec4(1, 0.2f, 0.2f, 1));
 		pausedText.render("Press \"Q\" to quit the game", glm::vec2(320, 325), 20, glm::vec4(1, 0.2f, 0.2f, 1));
@@ -184,6 +195,9 @@ void Game::mouseMove(int x, int y)
 			scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 			break;
 		}
+		case CREDITS: {
+			break;
+		}
 	}
 }
 
@@ -206,6 +220,9 @@ void Game::mousePress(int button)
 				scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
+			case CREDITS: {
+				break;
+			}
 		}
 	}
 	else if(button == GLUT_RIGHT_BUTTON)
@@ -222,6 +239,9 @@ void Game::mousePress(int button)
 			}
 			case SCENE2: {
 				scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
+			}
+			case CREDITS: {
 				break;
 			}
 		}
@@ -257,6 +277,8 @@ void Game::changeScene(GameScene scene) {
 		case SCENE2:
 			this->scene2->stop();
 			break;
+		case CREDITS:
+			break;
 	}
 	state = scene;
 	paused = false;
@@ -272,6 +294,8 @@ void Game::changeScene(GameScene scene) {
 		case SCENE2:
 			this->scene2 = new Scene2;
 			this->scene2->init();
+			break;
+		case CREDITS:
 			break;
 	}
 }

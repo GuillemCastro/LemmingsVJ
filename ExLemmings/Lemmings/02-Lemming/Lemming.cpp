@@ -549,10 +549,10 @@ int Lemming::collisionFloor(int maxFall)
 	int fall = 0;
 	glm::ivec2 posBase = sprite->position() + glm::vec2(/*120*/0.f, 0); // Add the map displacement
 
-	if (collisionCeilling(3) == 1) {
+	/*if (collisionCeilling(3) == 1) {
 		//cout << "collisionCeilling is 1" << endl;
 		return 1;
-	}
+	}*/
 	
 	posBase += glm::ivec2(7, 16);
 	while((fall < maxFall) && !bContact)
