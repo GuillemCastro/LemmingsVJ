@@ -9,6 +9,7 @@
 #include "MenuScene.h"
 #include "SoundManager.h"
 #include "Scene2.h"
+#include "CreditsScene.h"
 
 
 // Game is a singleton (a class with a single instance) that represents our whole application
@@ -82,6 +83,8 @@ private:
 
 	bool lemmingSelected;
 	bool faster;
+
+	CreditsScene* creditsScene;
 };
 
 

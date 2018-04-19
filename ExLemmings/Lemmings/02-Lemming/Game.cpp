@@ -80,6 +80,8 @@ bool Game::update(int deltaTime)
 					delete menuScene;
 					menuScene = NULL;
 				}
+				creditsScene->update(deltaTime);
+				lemmingSelected = false;
 				break;
 			}
 		}
@@ -104,6 +106,7 @@ void Game::render()
 			break;
 		}
 		case CREDITS: {
+			creditsScene->render();
 			break;
 		}
 	}
@@ -196,6 +199,7 @@ void Game::mouseMove(int x, int y)
 			break;
 		}
 		case CREDITS: {
+			creditsScene->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 			break;
 		}
 	}
@@ -221,6 +225,7 @@ void Game::mousePress(int button)
 				break;
 			}
 			case CREDITS: {
+				creditsScene->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
 		}
@@ -242,6 +247,7 @@ void Game::mousePress(int button)
 				break;
 			}
 			case CREDITS: {
+				creditsScene->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
 		}
@@ -296,6 +302,8 @@ void Game::changeScene(GameScene scene) {
 			this->scene2->init();
 			break;
 		case CREDITS:
+			this->creditsScene = new CreditsScene;
+			this->creditsScene->init();
 			break;
 	}
 }

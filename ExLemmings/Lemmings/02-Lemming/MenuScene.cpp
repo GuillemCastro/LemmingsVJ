@@ -41,6 +41,10 @@ void MenuScene::init() {
 	level3Tex.setMinFilter(GL_NEAREST);
 	level3Tex.setMagFilter(GL_NEAREST);
 
+	creditsTex.loadFromFile("images/credits.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	creditsTex.setMagFilter(GL_NEAREST);
+	creditsTex.setMinFilter(GL_NEAREST);
+
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH - 1), float(CAMERA_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -86,6 +90,17 @@ void MenuScene::render() {
 	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
 
 	levelButton->render(level3Tex);
+
+	simpleTexProgram.use();
+	simpleTexProgram.setUniformMatrix4f("projection", projection);
+	simpleTexProgram.setUniform4f("color", .5f, .5f, .5f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	modelview = glm::translate(modelview, glm::vec3(135.f, 160.0f, 0.0f));
+	simpleTexProgram.setUniformMatrix4f("modelview", modelview);
+
+	levelButton->render(creditsTex);
+
+
 }
 
 void MenuScene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRightButton) {
@@ -103,6 +118,10 @@ void MenuScene::mouseMoved(int mouseX, int mouseY, bool bLeftButton, bool bRight
 		}
 		else if (x >= 225 && x <= 275 && y >= 130 && y <= 155) {
 			Game::instance().changeScene(SCENE3);
+		}
+
+		else if (x >= 135 && x <= 185 && y >= 160 && y <= 185) {
+			Game::instance().changeScene(CREDITS);
 		}
 	}
 

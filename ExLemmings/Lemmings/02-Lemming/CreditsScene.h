@@ -3,11 +3,11 @@
 #include "ShaderProgram.h"
 #include "TexturedQuad.h"
 
-class MenuScene
+class CreditsScene
 {
 public:
-	MenuScene();
-	~MenuScene();
+	CreditsScene();
+	~CreditsScene();
 	void init();
 	void update(int deltaTime);
 	void render();
@@ -19,9 +19,7 @@ private:
 private:
 	Texture colorTexture;
 	ShaderProgram simpleTexProgram, maskedTexProgram;
-	TexturedQuad* menuScreen;
-	Texture level1Tex, level2Tex, level3Tex, creditsTex;
-	TexturedQuad* levelButton;
+	TexturedQuad* creditsScreen;
 	float currentTime;
 	glm::mat4 projection;
 };

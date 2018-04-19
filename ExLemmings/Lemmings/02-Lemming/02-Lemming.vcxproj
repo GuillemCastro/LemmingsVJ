@@ -14,6 +14,7 @@
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="common_defs.h" />
     <ClInclude Include="common_utils.h" />
+    <ClInclude Include="CreditsScene.h" />
     <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Scene2.h" />
@@ -32,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="common_utils.cpp" />
+    <ClCompile Include="CreditsScene.cpp" />
     <ClCompile Include="Door.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Scene2.cpp" />
