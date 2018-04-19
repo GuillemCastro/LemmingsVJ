@@ -14,7 +14,7 @@
 
 #define SCENE3_WIDTH 750
 #define SCENE3_HEIGHT 160
-#define SCENE3_MAX_TIME 180
+#define SCENE3_MAX_TIME 240
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.

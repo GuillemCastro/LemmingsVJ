@@ -138,8 +138,10 @@ void Lemming::update(int deltaTime)
 			break;
 		}
 		fall = collisionFloor(2);
-		if (fall > 0)
+		if (fall > 0) {
 			sprite->position() += glm::vec2(0, fall);
+			fallHight += fall;
+		}
 		else {
 			if (fallHight > 30) {
 				sprite->changeAnimation(DEATH);
@@ -435,7 +437,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case BUILDER_LEFT_STATE: {
-		if (builderCount >= 120 || collisionCeilling(2) < 1) {
+		if (builderCount >= 75 || collisionCeilling(2) < 1) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_LEFT_STATE;
@@ -448,6 +450,9 @@ void Lemming::update(int deltaTime)
 			sprite->changeAnimation(WALKING_RIGHT);
 		}
 		else {
+			if (builderCount <= 2) {
+				bridges->setPixel(sprite->position().x + 7, sprite->position().y + 16 - 1, 255);
+			}
 			bridges->setPixel(sprite->position().x + 7 - 3, sprite->position().y + 16 - 1, 255);
 			sprite->position() += glm::vec2(-1.f, -1.f);
 			int fall = collisionFloor(2);
@@ -459,7 +464,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case BUILDER_RIGHT_STATE: {
-		if (builderCount >= 120 || collisionCeilling(2) < 1) {
+		if (builderCount >= 75 || collisionCeilling(2) < 1) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_RIGHT_STATE;
@@ -472,6 +477,9 @@ void Lemming::update(int deltaTime)
 			sprite->changeAnimation(WALKING_LEFT);
 		}
 		else {
+			if (builderCount <= 2) {
+				bridges->setPixel(sprite->position().x + 7, sprite->position().y + 16 - 1, 255);
+			}
 			bridges->setPixel(sprite->position().x + 7 + 3, sprite->position().y + 16 -1, 255);
 			sprite->position() += glm::vec2(1.f, -1.f);
 			int fall = collisionFloor(2);
