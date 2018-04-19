@@ -40,7 +40,7 @@ void Scene3::init()
 
 	backgroundMusicID = SoundManager::instance().play(LETSGO, false);
 	backgroundMusicPlaying = false;
-	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(750.f, 160.f) };
+	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(924.f, 160.f) };
 	glm::vec2 texCoords[2] = { glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f) };
 	glm::vec2 geomButton[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(CAMERA_WIDTH), 30.f) };
 	glm::vec2 texCoordsButton[2] = { glm::vec2(0.0f,  0.0f), glm::vec2(1.f, 1.f) };
@@ -81,7 +81,7 @@ void Scene3::init()
 		std::cout << "Could not load font!!!" << endl;
 
 	entryDoor.init(glm::vec2(120 + 60, 80), simpleTexProgram, true);
-	exitDoor.init(glm::vec2(470, 40), simpleTexProgram, false);
+	exitDoor.init(glm::vec2(570, 98), simpleTexProgram, false);
 
 	cameraPos = { 0, CAMERA_HEIGHT, 0, CAMERA_WIDTH };
 
