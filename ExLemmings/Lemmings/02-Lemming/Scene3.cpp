@@ -82,7 +82,7 @@ void Scene3::init()
 		std::cout << "Could not load font!!!" << endl;
 
 	entryDoor.init(glm::vec2(120 + 60, 80), simpleTexProgram, true);
-	exitDoor.init(glm::vec2(733, 107), simpleTexProgram, false);
+	exitDoor.init(glm::vec2(450, 107), simpleTexProgram, false);
 
 	cameraPos = { 0, CAMERA_HEIGHT, 0, CAMERA_WIDTH };
 
