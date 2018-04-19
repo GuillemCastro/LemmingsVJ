@@ -94,7 +94,7 @@ void Scene3::init()
 		lemmings[i].setBridges(&bridgesTextureMask);
 		lemmingInit[i] = 0;
 	}
-	lemmingInit[0] = 1;
+	//lemmingInit[0] = 1;
 
 	powerNumbers[CLIMBER] = 0;
 	powerNumbers[UMBRELLA] = 0;
