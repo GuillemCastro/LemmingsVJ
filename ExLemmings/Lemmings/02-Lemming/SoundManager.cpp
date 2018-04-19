@@ -25,6 +25,8 @@ bool SoundManager::init() {
 
 	buffers[LETSGO].loadFromFile("sounds/LETSGO2.WAV");
 
+	buffers[MUSIC3].loadFromFile("sounds/lemmings3.ogg");
+
 	return true;
 }
 

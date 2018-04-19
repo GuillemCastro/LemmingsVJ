@@ -8,9 +8,10 @@
 #include <iostream>
 #include "MenuScene.h"
 #include "SoundManager.h"
+#include "Scene.h"
 #include "Scene2.h"
 #include "CreditsScene.h"
-
+#include "Scene3.h"
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 
@@ -65,6 +66,7 @@ private:
 	bool paused;					  // Game paused?
 	Scene* scene1;                      // Scene to render
 	Scene2* scene2;
+	Scene3* scene3;
 	MenuScene* menuScene;
 	bool keys[256], specialKeys[256]; // Store key states so that 
 	                                  // we can have access at any time

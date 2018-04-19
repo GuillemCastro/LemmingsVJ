@@ -70,6 +70,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CreditsScene.h">
+	<Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -126,6 +129,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CreditsScene.cpp">
+	<Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

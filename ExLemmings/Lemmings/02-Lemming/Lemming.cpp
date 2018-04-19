@@ -190,7 +190,7 @@ void Lemming::update(int deltaTime)
 		break;
 	case WALKING_LEFT_STATE:
 		sprite->position() += glm::vec2(-1, -1);
-		if(collision(LEFT))
+		if(collision(LEFT) || collisionStopper(LEFT))
 		{
 			if (power == BASHER) {
 				state = BASHER_LEFT_STATE;
@@ -221,7 +221,7 @@ void Lemming::update(int deltaTime)
 		break;
 	case WALKING_RIGHT_STATE:
 		sprite->position() += glm::vec2(1, -1);
-		if(collision(RIGHT))
+		if(collision(RIGHT) || collisionStopper(RIGHT))
 		{
 			if (power == BASHER) {
 				//cout << "collision right, changing to basher" << endl;
@@ -435,7 +435,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case BUILDER_LEFT_STATE: {
-		if (builderCount >= 50 || collisionCeilling(2) < 1) {
+		if (builderCount >= 120 || collisionCeilling(2) < 1) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_LEFT_STATE;
@@ -459,7 +459,7 @@ void Lemming::update(int deltaTime)
 		break;
 	}
 	case BUILDER_RIGHT_STATE: {
-		if (builderCount >= 50 || collisionCeilling(2) < 1) {
+		if (builderCount >= 120 || collisionCeilling(2) < 1) {
 			builderCount = 0;
 			power = NONE;
 			state = WALKING_RIGHT_STATE;
@@ -669,22 +669,22 @@ bool Lemming::collisionStopper(Direction direction) {
 
 	if (direction == LEFT) {
 		for (int i = 7; i < 14; ++i) {
-			if (!ignoreBlocker && mask->pixel(posBase.x + 3, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
+			if (/*!ignoreBlocker &&*/ mask->pixel(posBase.x + 3, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 4, posBase.y + i) == blockerMask) {
 				ret = true;
 			}
-			else if (ignoreBlocker) {
+			/*else if (ignoreBlocker) {
 				ignoreBlocker = 0;
-			}
+			}*/
 		}
 	}
 	else if (direction == RIGHT) {
 		for (int i = 7; i < 14; ++i) {
-			if (!ignoreBlocker && mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 10, posBase.y + i) == blockerMask) {
+			if (/*!ignoreBlocker &&*/ mask->pixel(posBase.x + 11, posBase.y + i) == blockerMask || mask->pixel(posBase.x + 10, posBase.y + i) == blockerMask) {
 				ret = true;
 			}
-			else if (ignoreBlocker) {
+			/*else if (ignoreBlocker) {
 				ignoreBlocker = 0;
-			}
+			}*/
 		}
 	}
 

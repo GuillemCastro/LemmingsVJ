@@ -9,6 +9,7 @@ enum Sound {
 	DIE,
 	MUSIC2,
 	LETSGO,
+	MUSIC3,
 
 	NUM_SOUNDS
 };
