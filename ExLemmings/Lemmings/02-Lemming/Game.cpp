@@ -75,6 +75,16 @@ bool Game::update(int deltaTime)
 				lemmingSelected = scene2->isALemmingAt(mouseX / ratio, mouseY / ratio);
 				break;
 			}
+			case SCENE3: {
+				if (menuScene != NULL) {
+					delete menuScene;
+					menuScene = NULL;
+				}
+				scene3->update(deltaTime);
+				int ratio = VIEWPORT_HEIGHT / CAMERA_HEIGHT;
+				lemmingSelected = scene3->isALemmingAt(mouseX / ratio, mouseY / ratio);
+				break;
+			}
 			case CREDITS: {
 				if (menuScene != NULL) {
 					delete menuScene;
@@ -101,6 +111,10 @@ void Game::render()
 		}
 		case SCENE2: {
 			scene2->render();
+			break;
+		}
+		case SCENE3: {
+			scene3->render();
 			break;
 		}
 		case CREDITS: {
@@ -195,6 +209,10 @@ void Game::mouseMove(int x, int y)
 			scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 			break;
 		}
+		case SCENE3: {
+			scene3->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+			break;
+		}
 		case CREDITS: {
 			break;
 		}
@@ -220,6 +238,10 @@ void Game::mousePress(int button)
 				scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
+			case SCENE3: {
+				scene3->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
+			}
 			case CREDITS: {
 				break;
 			}
@@ -239,6 +261,10 @@ void Game::mousePress(int button)
 			}
 			case SCENE2: {
 				scene2->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
+				break;
+			}
+			case SCENE3: {
+				scene3->mouseMoved(mouseX, mouseY, bLeftMouse, bRightMouse);
 				break;
 			}
 			case CREDITS: {
@@ -277,6 +303,9 @@ void Game::changeScene(GameScene scene) {
 		case SCENE2:
 			this->scene2->stop();
 			break;
+		case SCENE3:
+			this->scene3->stop();
+			break;
 		case CREDITS:
 			break;
 	}
@@ -294,6 +323,10 @@ void Game::changeScene(GameScene scene) {
 		case SCENE2:
 			this->scene2 = new Scene2;
 			this->scene2->init();
+			break;
+		case SCENE3:
+			this->scene3 = new Scene3;
+			this->scene3->init();
 			break;
 		case CREDITS:
 			break;
