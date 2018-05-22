@@ -1,7 +1,8 @@
 # LemmingsVJ
 
-Guillem Castro
-David Williams
+## Autors
+- Guillem Castro
+- David Williams
 
 
 ## Funcionalitats implementades
